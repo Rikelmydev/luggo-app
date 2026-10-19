@@ -1,0 +1,23 @@
+.stage { position: relative; height: 100%; aspect-ratio: 1000 / 1312; }
+.suitcase { position: relative; width: 100%; height: 100%; transform-origin: 50% 96%; }
+.layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+.suitcase > .layer:nth-child(2) { z-index: 1; }
+.suitcase > .layer:nth-child(3) { z-index: 2; }
+.tagWrap, .suitcase > .tag { position: absolute; z-index: 3; left: 37%; top: 30.4%; width: 30%; transform-origin: 50% 0; }
+.suitcase > .tag { transform: rotate(8deg); }
+.tagWrap { cursor: grab; }
+.string { width: 22%; height: auto; margin-inline: auto; overflow: visible; }
+.string path { fill: none; stroke: var(--navy); stroke-width: 3; stroke-linecap: round; }
+.card {
+  position: relative; margin-top: -4px; container-type: inline-size;
+  background: var(--blue); color: #fff; border-radius: 14px; padding: 26% 10% 12%;
+  display: grid; justify-items: start; gap: 2px;
+  box-shadow: 0 16px 24px -12px rgba(11, 18, 64, 0.55);
+}
+.hole {
+  position: absolute; top: 9%; left: 50%; width: 14%; aspect-ratio: 1; transform: translateX(-50%);
+  border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px rgba(11, 18, 64, 0.25);
+}
+.plane { width: 22cqi; height: 22cqi; color: var(--yellow); }
+.name { font-weight: 900; font-stretch: 110%; font-size: 19cqi; line-height: 1; letter-spacing: -0.03em; }
+.line { font-weight: 760; font-size: 9.5cqi; line-height: 1.12; color: var(--yellow); }

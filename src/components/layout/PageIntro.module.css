@@ -1,0 +1,3 @@
+.intro { background: var(--blue); color: #fff; padding: clamp(36px, 6vw, 72px) 0 clamp(32px, 4vw, 48px); }
+.lede { margin-top: 12px; color: var(--on-blue-2); font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); max-width: 58ch; }
+.lede a { color: var(--yellow); }

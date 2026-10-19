@@ -1,0 +1,12 @@
+.list { border-top: 1px solid var(--line); }
+.item { border-bottom: 1px solid var(--line); }
+.h { font-size: inherit; font-weight: inherit; }
+.q {
+  width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; text-align: left;
+  padding: 18px 4px; font-weight: 720; font-size: 1.0625rem; color: var(--ink);
+}
+.q:hover { color: var(--accent-ink); }
+.caret { flex: none; transition: transform .25s var(--ease-out); color: var(--accent-ink); }
+.q[aria-expanded='true'] .caret { transform: rotate(180deg); }
+.panel { overflow: hidden; }
+.a { padding: 0 4px 20px; color: var(--ink-2); max-width: 68ch; }

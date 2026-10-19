@@ -1,0 +1,9 @@
+.shell { min-height: 100dvh; display: flex; flex-direction: column; }
+.page { padding-top: var(--nav-h); flex: 1; }
+.home { flex: 1; }
+.page:focus, .home:focus { outline: none; }
+.skip {
+  position: fixed; left: 16px; top: -60px; z-index: 100; background: var(--yellow); color: var(--navy);
+  font-weight: 760; padding: 10px 16px; border-radius: 999px; text-decoration: none;
+}
+.skip:focus { top: 12px; }

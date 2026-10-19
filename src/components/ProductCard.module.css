@@ -1,0 +1,27 @@
+.card { position: relative; display: grid; grid-template-rows: auto 1fr; border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-1); overflow: hidden; transition: transform .25s var(--ease-out), box-shadow .25s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(11, 18, 64, 0.06), 0 22px 40px -22px rgba(25, 48, 180, 0.45); }
+.card:focus-within { outline: 3px solid var(--blue); outline-offset: 3px; }
+.media { position: relative; display: block; height: 240px; background: var(--mist); }
+.media img { position: absolute; left: 16px; top: 22px; width: calc(100% - 32px); height: calc(100% - 28px); object-fit: contain; object-position: bottom; transition: transform .35s var(--ease-out); }
+.card:hover .media img { transform: translateY(-4px) rotate(-1.5deg); }
+.size {
+  position: absolute; top: 14px; left: 14px; padding: 4px 10px; border-radius: 999px;
+  background: var(--card); color: var(--ink); font-weight: 720; font-size: 0.8125rem;
+}
+.body { padding: 16px 18px 18px; display: grid; gap: 8px; align-content: start; }
+.name { font-weight: 800; font-stretch: 104%; font-size: 1.1875rem; letter-spacing: -0.01em; }
+.name a { text-decoration: none; color: inherit; }
+.name a::after { content: ''; position: absolute; inset: 0; z-index: 0; }
+.name a:focus-visible { outline: none; }
+.spec { color: var(--ink-2); font-size: 0.875rem; }
+.swatches { position: relative; z-index: 1; display: flex; gap: 8px; }
+.swatch { width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5); }
+.swatch[aria-checked='true'] { outline: 2px solid var(--ink); outline-offset: 2px; }
+.price { margin-top: 2px; }
+.price strong { font-size: 1.25rem; font-weight: 850; color: var(--accent-ink); }
+.was { color: var(--ink-3); font-size: 0.875rem; text-decoration: line-through; }
+.period { color: var(--ink-2); font-size: 0.875rem; }
+.stock { font-size: 0.8125rem; font-weight: 700; color: var(--success); }
+.stockLow { color: var(--warning); }
+.stockOut { color: var(--danger); }
+.soldOut .media img { opacity: 0.45; filter: grayscale(0.6); }

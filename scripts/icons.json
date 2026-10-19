@@ -1,0 +1,143 @@
+{
+  "AirplaneTilt": [
+    "fill"
+  ],
+  "ArrowCounterClockwise": [
+    "regular"
+  ],
+  "ArrowRight": [
+    "regular"
+  ],
+  "ArrowUUpLeft": [
+    "regular"
+  ],
+  "ArrowsClockwise": [
+    "regular"
+  ],
+  "Broom": [
+    "regular"
+  ],
+  "CalendarBlank": [
+    "regular"
+  ],
+  "CalendarCheck": [
+    "regular"
+  ],
+  "CalendarPlus": [
+    "regular"
+  ],
+  "CaretDown": [
+    "bold"
+  ],
+  "CaretLeft": [
+    "bold"
+  ],
+  "CaretRight": [
+    "regular",
+    "bold"
+  ],
+  "ChartBar": [
+    "regular"
+  ],
+  "ChatCircleText": [
+    "regular"
+  ],
+  "CheckCircle": [
+    "fill"
+  ],
+  "ClockCountdown": [
+    "regular"
+  ],
+  "Copy": [
+    "regular"
+  ],
+  "CreditCard": [
+    "regular"
+  ],
+  "EnvelopeSimple": [
+    "regular"
+  ],
+  "Info": [
+    "bold"
+  ],
+  "List": [
+    "regular"
+  ],
+  "ListChecks": [
+    "regular"
+  ],
+  "LockKey": [
+    "regular"
+  ],
+  "MagnifyingGlass": [
+    "regular"
+  ],
+  "MapPin": [
+    "regular"
+  ],
+  "Minus": [
+    "bold"
+  ],
+  "Package": [
+    "regular"
+  ],
+  "PencilSimple": [
+    "regular"
+  ],
+  "PixLogo": [
+    "regular"
+  ],
+  "Plus": [
+    "bold"
+  ],
+  "Printer": [
+    "regular"
+  ],
+  "SealCheck": [
+    "fill"
+  ],
+  "ShieldCheck": [
+    "regular"
+  ],
+  "SignOut": [
+    "regular"
+  ],
+  "Sparkle": [
+    "regular"
+  ],
+  "SpinnerGap": [
+    "regular"
+  ],
+  "Storefront": [
+    "regular"
+  ],
+  "Suitcase": [
+    "regular",
+    "bold"
+  ],
+  "SunHorizon": [
+    "regular"
+  ],
+  "Trash": [
+    "regular"
+  ],
+  "Truck": [
+    "regular"
+  ],
+  "Warning": [
+    "fill"
+  ],
+  "WarningCircle": [
+    "regular",
+    "fill"
+  ],
+  "Wrench": [
+    "regular"
+  ],
+  "X": [
+    "regular"
+  ],
+  "XCircle": [
+    "regular"
+  ]
+}

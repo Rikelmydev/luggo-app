@@ -1,0 +1,9 @@
+.sum { display: grid; gap: 10px; }
+.row { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+.row dt { color: var(--ink); font-size: 0.9375rem; }
+.row dd { font-weight: 680; white-space: nowrap; }
+.sub { display: block; color: var(--ink-2); font-size: 0.8125rem; }
+.discount dt, .discount dd { color: var(--success); }
+.total { margin-top: 6px; padding-top: 14px; border-top: 1px dashed var(--field-line); }
+.total dt { font-weight: 780; font-size: 1.0625rem; }
+.total dd { font-weight: 880; font-stretch: 104%; font-size: 1.625rem; letter-spacing: -0.02em; color: var(--accent-ink); }

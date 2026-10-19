@@ -1,0 +1,36 @@
+.empty { display: grid; justify-items: center; text-align: center; gap: 10px; padding: clamp(40px, 8vw, 80px) 16px; }
+.emptyIcon { width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center; background: var(--mist); color: var(--accent-ink); margin-bottom: 6px; }
+.emptyTitle { font-weight: 820; font-stretch: 104%; font-size: 1.5rem; letter-spacing: -0.015em; }
+.emptyText { color: var(--ink-2); max-width: 46ch; }
+.emptyAction { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+
+.skeleton {
+  display: block; background: linear-gradient(90deg, var(--paper-2) 0%, var(--mist) 50%, var(--paper-2) 100%);
+  background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.switchRow { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; cursor: pointer; }
+/* O input cobre o trilho: o toque cai nele mesmo, e o rótulo inteiro também alterna. */
+.switchInput { position: absolute; left: 0; top: 0; width: 48px; height: 30px; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.switchTrack {
+  position: relative; width: 48px; height: 28px; border-radius: 999px; background: var(--line-strong); margin-top: 1px;
+  transition: background-color .2s;
+}
+.switchThumb {
+  position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff;
+  box-shadow: 0 2px 6px rgba(11, 18, 64, 0.3); transition: transform .25s var(--ease-out);
+}
+.switchInput:checked + .switchTrack { background: var(--blue); }
+.switchInput:checked + .switchTrack .switchThumb { transform: translateX(20px); }
+.switchInput:focus-visible + .switchTrack { outline: 3px solid var(--blue); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) { .switchInput:checked + .switchTrack { background: var(--yellow); } }
+.switchText { display: grid; gap: 2px; }
+.switchLabel { font-weight: 720; }
+.switchDesc { color: var(--ink-2); font-size: 0.9375rem; }
+
+.notice { padding: 12px 16px; border-radius: 12px; font-size: 0.9375rem; font-weight: 560; line-height: 1.45; }
+.info { background: var(--mist); color: var(--ink); }
+.warn { background: var(--warning-bg); color: var(--warning); }
+.bad { background: var(--danger-bg); color: var(--danger); }
+.ok { background: var(--success-bg); color: var(--success); }

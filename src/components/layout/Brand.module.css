@@ -1,0 +1,8 @@
+.mark { display: inline-flex; align-items: center; gap: 8px; }
+.plane { width: 26px; height: 26px; color: var(--yellow); }
+.word { font-weight: 900; font-stretch: 112%; font-size: 1.5rem; letter-spacing: -0.03em; line-height: 1; }
+
+.lockup { display: inline-grid; grid-template-columns: auto auto; column-gap: 8px; align-items: center; justify-content: start; }
+.lockPlane { width: 32px; height: 32px; color: var(--yellow); }
+.lockName { font-weight: 900; font-stretch: 112%; font-size: 1.875rem; letter-spacing: -0.03em; line-height: 1; color: #fff; }
+.lockLine { grid-column: 2; font-weight: 760; color: var(--yellow); font-size: 1.0625rem; line-height: 1.2; }

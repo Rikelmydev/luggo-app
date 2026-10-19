@@ -1,0 +1,38 @@
+.wrap { display: grid; gap: 18px; }
+.demo {
+  display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 12px;
+  background: var(--warning-bg); color: var(--warning); font-size: 0.875rem; font-weight: 620;
+}
+.demo svg { flex: none; margin-top: 1px; }
+.pix { display: grid; grid-template-columns: auto 1fr; gap: 18px 22px; align-items: center; }
+.qr { padding: 10px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1.5px var(--field-line); line-height: 0; }
+.howto { display: grid; gap: 8px; counter-reset: h; font-size: 0.9375rem; }
+.howto li { counter-increment: h; display: grid; grid-template-columns: 24px 1fr; gap: 8px; }
+.howto li::before {
+  content: counter(h); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--mist); color: var(--accent-ink); font-weight: 800; font-size: 0.8125rem;
+}
+.copyRow { grid-column: 1 / -1; display: flex; gap: 8px; }
+.copyRow input {
+  flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1.5px solid var(--field-line);
+  background: var(--paper-2); color: var(--ink-2); font-size: 0.8125rem; font-family: ui-monospace, Consolas, monospace;
+}
+.timer { grid-column: 1 / -1; color: var(--ink-2); font-size: 0.9375rem; }
+.timer strong { color: var(--ink); }
+.card { display: grid; gap: 12px; justify-items: start; }
+.cardIcon { color: var(--accent-ink); }
+.redirect { display: flex; gap: 12px; align-items: center; font-weight: 650; }
+.spin { animation: spin 0.9s linear infinite; color: var(--accent-ink); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.demoChoice { font-weight: 600; }
+.actions { display: grid; gap: 10px; }
+.switch {
+  justify-self: center; display: inline-flex; gap: 6px; align-items: center; padding: 8px 10px; border-radius: 10px;
+  font-weight: 680; font-size: 0.9375rem; color: var(--accent-ink);
+}
+.switch:hover:not(:disabled) { background: var(--mist); }
+.switch:disabled { opacity: 0.5; }
+@media (max-width: 520px) {
+  .pix { grid-template-columns: 1fr; justify-items: center; }
+  .howto { justify-self: stretch; }
+}

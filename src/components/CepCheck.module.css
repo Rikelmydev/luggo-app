@@ -1,0 +1,15 @@
+.form { display: grid; gap: 10px; }
+.label { font-weight: 760; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.inputWrap { position: relative; flex: 1 1 180px; }
+.icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--accent-ink); }
+.input {
+  width: 100%; min-height: 50px; padding: 0 14px 0 42px; border-radius: 999px;
+  border: 1.5px solid var(--field-line); background: var(--field); font-size: 1rem; font-variant-numeric: tabular-nums;
+}
+.input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(36, 69, 255, 0.18); }
+.result { min-height: 1.5em; font-weight: 600; font-size: 0.9375rem; }
+.yes, .no { display: inline-flex; gap: 8px; align-items: flex-start; }
+.yes svg, .no svg { flex: none; margin-top: 1px; }
+.yes { color: var(--success); }
+.no { color: var(--warning); }

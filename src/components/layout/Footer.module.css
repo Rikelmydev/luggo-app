@@ -1,0 +1,15 @@
+.footer { background: var(--night); color: #c9d0f2; padding: 64px 0 28px; margin-top: auto; }
+.grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr; gap: 36px; }
+.brandCol { display: grid; gap: 16px; align-content: start; }
+.pitch { max-width: 34ch; font-size: 0.9375rem; }
+.col { display: grid; gap: 8px; align-content: start; font-size: 0.9375rem; }
+.head { color: #fff; font-weight: 780; margin-bottom: 6px; }
+.col a { color: #c9d0f2; text-decoration: none; width: fit-content; }
+.col a:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+.muted { color: #9aa4d8; font-size: 0.875rem; }
+.hours { margin-top: 8px; display: grid; gap: 4px; }
+.hours div { display: flex; justify-content: space-between; gap: 12px; max-width: 280px; }
+.hours dd { color: #fff; font-weight: 600; }
+.bottom { margin-top: 48px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.8125rem; color: #9aa4d8; }
+@media (max-width: 899px) { .grid { grid-template-columns: 1fr 1fr; } .brandCol { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }

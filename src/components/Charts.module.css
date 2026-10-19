@@ -1,0 +1,38 @@
+.figure { margin: 0; display: grid; gap: 8px; --series: #2445ff; }
+@media (prefers-color-scheme: dark) { .figure { --series: #6b84ff; } }
+.plot { position: relative; width: 100%; }
+.plot svg { display: block; overflow: visible; }
+.grid { stroke: var(--line); stroke-width: 1; }
+.baseline { stroke: var(--line-strong); stroke-width: 1; }
+.tick { fill: var(--ink-3); font-size: 12px; font-weight: 560; font-family: inherit; font-variant-numeric: tabular-nums; }
+.peak { fill: var(--ink); font-size: 12px; font-weight: 760; font-family: inherit; }
+.bar { fill: var(--series); transition: opacity .15s; }
+.barHover { opacity: 0.75; }
+.hit { fill: transparent; cursor: default; outline: none; }
+.hit:focus-visible { fill: rgba(36, 69, 255, 0.08); }
+.tip {
+  position: absolute; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap;
+  display: grid; padding: 8px 10px; border-radius: 10px; background: var(--navy); color: #fff;
+  box-shadow: 0 10px 24px -12px rgba(5, 10, 40, 0.6); font-size: 0.8125rem;
+}
+.tip strong { font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
+.tip span { color: #c9d0f2; }
+@media (prefers-color-scheme: dark) { .tip { background: #fff; color: var(--navy); } .tip span { color: var(--ink-3); } }
+
+.barList { display: grid; gap: 12px; }
+.barList li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 12px; align-items: center; }
+.barLabel { font-weight: 650; font-size: 0.9375rem; display: grid; }
+.barLabel small { color: var(--ink-3); font-weight: 520; font-size: 0.8125rem; }
+.barTrack { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.hbar { height: 16px; min-width: 2px; background: var(--series); border-radius: 0 4px 4px 0; }
+.barValue { font-weight: 760; font-size: 0.875rem; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+
+.table summary { cursor: pointer; font-size: 0.8125rem; font-weight: 650; color: var(--accent-ink); width: fit-content; }
+.table table { margin-top: 8px; width: 100%; max-width: 360px; border-collapse: collapse; font-size: 0.875rem; }
+.table th, .table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); font-weight: 520; }
+.table td { text-align: right; }
+
+.stat { padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); display: grid; gap: 2px; align-content: start; }
+.statLabel { font-size: 0.875rem; font-weight: 620; color: var(--ink-2); }
+.statValue { font-size: clamp(1.625rem, 1.3rem + 1vw, 2.125rem); font-weight: 760; letter-spacing: -0.02em; line-height: 1.15; }
+.statNote { font-size: 0.8125rem; color: var(--ink-3); }

@@ -1,0 +1,27 @@
+.field {
+  width: 100%; display: flex; align-items: center; gap: 14px; text-align: left;
+  min-height: 60px; padding: 10px 16px; border-radius: 14px;
+  transition: border-color .2s, background-color .2s, box-shadow .2s;
+}
+.card { background: var(--field); border: 1.5px solid var(--field-line); color: var(--ink); }
+.card:hover { border-color: var(--accent-ink); }
+.light { background: rgba(255, 255, 255, 0.1); border: 1.5px solid rgba(255, 255, 255, 0.28); color: #fff; }
+.light:hover { background: rgba(255, 255, 255, 0.16); }
+.icon { flex: none; color: var(--accent-ink); }
+.light .icon { color: var(--yellow); }
+.part { display: grid; min-width: 0; }
+.label { font-size: 0.75rem; font-weight: 650; font-stretch: 90%; color: var(--ink-2); letter-spacing: 0.01em; }
+.light .label { color: var(--on-blue-2); }
+.value { font-weight: 760; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sep { width: 1px; align-self: stretch; background: var(--line-strong); margin: 4px 0; }
+.light .sep { background: rgba(255, 255, 255, 0.28); }
+.days {
+  margin-left: auto; flex: none; font-size: 0.8125rem; font-weight: 720; padding: 4px 10px; border-radius: 999px;
+  background: var(--mist); color: var(--accent-ink);
+}
+.light .days { background: rgba(255, 255, 255, 0.16); color: #fff; }
+@media (max-width: 420px) {
+  .field { gap: 10px; padding: 10px 12px; }
+  .icon { display: none; }
+  .days { display: none; }
+}

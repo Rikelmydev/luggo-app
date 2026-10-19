@@ -1,0 +1,3 @@
+.wrap { padding-block: clamp(64px, 12vw, 140px); display: grid; gap: 16px; justify-items: start; }
+.code { font-weight: 900; font-stretch: 80%; font-size: clamp(5rem, 3rem + 10vw, 10rem); line-height: 0.85; color: var(--accent-ink); letter-spacing: -0.04em; }
+.actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
