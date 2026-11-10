@@ -17,8 +17,8 @@ export function Footer() {
           <Link to="/malas">Todas as malas</Link>
           <Link to="/malas?tamanho=kit">Kits</Link>
           <Link to="/como-funciona">Como funciona</Link>
-          <Link to="/perguntas">Perguntas frequentes</Link>
-          <Link to="/minhas-reservas">Minhas reservas</Link>
+          <Link to="/" state={{ section: 'perguntas' }} preventScrollReset>Perguntas frequentes</Link>
+          <Link to="/minhas-reservas">Reservas</Link>
         </nav>
         <nav aria-label="Luggo" className={styles.col}>
           <p className={styles.head}>Luggo</p>

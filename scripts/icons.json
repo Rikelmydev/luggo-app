@@ -2,8 +2,14 @@
   "AirplaneTilt": [
     "fill"
   ],
+  "AppleLogo": [
+    "fill"
+  ],
   "ArrowCounterClockwise": [
     "regular"
+  ],
+  "ArrowLeft": [
+    "bold"
   ],
   "ArrowRight": [
     "regular"
@@ -56,6 +62,9 @@
   ],
   "EnvelopeSimple": [
     "regular"
+  ],
+  "GoogleLogo": [
+    "bold"
   ],
   "Info": [
     "bold"

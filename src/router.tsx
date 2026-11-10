@@ -1,10 +1,10 @@
-import { createBrowserRouter } from 'react-router'
+import { Navigate, createBrowserRouter } from 'react-router'
 import { Layout } from './components/layout/Layout'
 import { BagPage } from './pages/BagPage'
 import { Catalog } from './pages/Catalog'
 import { Checkout } from './pages/Checkout'
 import { Home } from './pages/Home'
-import { About, Contact, FaqPage, HowItWorks, Terms } from './pages/InfoPages'
+import { About, Contact, HowItWorks, Terms } from './pages/InfoPages'
 import { MyOrders } from './pages/MyOrders'
 import { NotFound } from './pages/NotFound'
 import { OrderPage } from './pages/OrderPage'
@@ -29,7 +29,8 @@ export const router = createBrowserRouter(
         { path: 'pedido/:code', Component: OrderPage },
         { path: 'minhas-reservas', Component: MyOrders },
         { path: 'como-funciona', Component: HowItWorks },
-        { path: 'perguntas', Component: FaqPage },
+        // As perguntas moram na página principal; o endereço antigo leva até elas.
+        { path: 'perguntas', element: <Navigate to="/" replace state={{ section: 'perguntas' }} /> },
         { path: 'termos', Component: Terms },
         { path: 'contato', Component: Contact },
         { path: 'sobre', Component: About },

@@ -16,14 +16,6 @@
 .policyGrid dt svg { color: var(--blue); }
 .policyGrid dd { color: #2a315c; margin-top: 4px; }
 
-/* FAQ */
-.faq { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; align-items: start; }
-.toc { position: sticky; top: calc(var(--nav-h) + 24px); display: grid; gap: 4px; }
-.toc a { padding: 8px 12px; border-radius: 10px; text-decoration: none; font-weight: 650; color: var(--ink-2); }
-.toc a:hover { background: var(--mist); color: var(--accent-ink); }
-.faqGroups { display: grid; gap: 44px; max-width: 780px; }
-.faqGroups section { display: grid; gap: 10px; scroll-margin-top: calc(var(--nav-h) + 24px); }
-
 /* Termos */
 .terms { max-width: 780px; display: grid; gap: 28px; }
 .terms h2 { font-weight: 800; font-size: 1.25rem; margin-bottom: 8px; }
@@ -82,7 +74,7 @@
 }
 
 @media (max-width: 899px) {
-  .faq, .contact { grid-template-columns: 1fr; }
+  .contact { grid-template-columns: 1fr; }
   .toc { position: static; display: flex; flex-wrap: wrap; }
   .policyGrid { grid-template-columns: 1fr; }
 }

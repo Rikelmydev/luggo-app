@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useNavigationType } from 'react-router'
+import { useReducedMotion } from 'motion/react'
 import {
   ArrowsClockwise,
   Broom,
@@ -14,7 +15,7 @@ import {
 } from '../components/ui/icons'
 import { BUSINESS } from '../config/business'
 import { COLOR_INFO, MODELS, SIZE_INFO, getModel, type Size } from '../data/catalog'
-import { FAQ_HIGHLIGHTS } from '../data/faq'
+import { FAQ, FAQ_HIGHLIGHTS } from '../data/faq'
 import { moneyShort } from '../lib/format'
 import { useBag } from '../state/bag'
 import { usePageTitle } from '../state/hooks'
@@ -35,8 +36,21 @@ const SIZE_FILTERS: { value: '' | Size | 'kit'; label: string }[] = [
 
 const fromPrice = (size: Size) => Math.min(...MODELS.filter((m) => m.size === size && m.kind !== 'kit').map((m) => m.daily))
 
+/** Desce suavemente até a seção pedida por um link. Ao voltar, vale a posição em que a pessoa estava. */
+function useScrollToSection() {
+  const { state, key } = useLocation()
+  const navigationType = useNavigationType()
+  const reduce = useReducedMotion()
+  const section = (state as { section?: string } | null)?.section
+  useEffect(() => {
+    if (!section || navigationType === 'POP') return
+    document.getElementById(section)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
+  }, [section, key, navigationType, reduce])
+}
+
 export function Home() {
   usePageTitle('')
+  useScrollToSection()
   return (
     <>
       <Hero />
@@ -165,7 +179,7 @@ function Delivery() {
   return (
     <section className={styles.delivery} aria-labelledby="entrega-titulo">
       <div className="container">
-        <h2 id="entrega-titulo" className="display h2">Na sua porta ou no caminho do metrô</h2>
+        <h2 id="entrega-titulo" className="display h2">Na sua porta e no caminho da viagem</h2>
         <div className={styles.deliveryGrid}>
           <article className={styles.option}>
             <Truck size={34} className={styles.optIcon} aria-hidden="true" />
@@ -228,14 +242,28 @@ function Included() {
 }
 
 function Faq() {
+  const [all, setAll] = useState(false)
   return (
-    <section className={styles.faq} aria-labelledby="faq-titulo">
+    <section id="perguntas" className={styles.faq} aria-labelledby="faq-titulo">
       <div className={`container ${styles.faqGrid}`}>
-        <div>
+        <div className={styles.faqHead}>
           <h2 id="faq-titulo" className="display h2">Perguntas que todo mundo faz</h2>
-          <Link to="/perguntas" className={`link ${styles.allFaq}`}>Ver todas as perguntas</Link>
+          <button type="button" className={`link ${styles.allFaq}`} aria-expanded={all} onClick={() => setAll((v) => !v)}>
+            {all ? 'Ver menos perguntas' : 'Ver todas as perguntas'}
+          </button>
         </div>
-        <Accordion items={FAQ_HIGHLIGHTS} />
+        {all ? (
+          <div className={styles.faqGroups}>
+            {FAQ.map((g) => (
+              <div key={g.title}>
+                <p className={styles.faqGroupTitle}>{g.title}</p>
+                <Accordion items={g.items} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Accordion items={FAQ_HIGHLIGHTS} />
+        )}
       </div>
     </section>
   )

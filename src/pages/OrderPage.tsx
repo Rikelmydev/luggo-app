@@ -12,6 +12,7 @@ import { useAsync, usePageTitle } from '../state/hooks'
 import { OrderTicket } from '../components/OrderTicket'
 import { PaymentModal } from '../components/PaymentModal'
 import { PriceSummary } from '../components/PriceSummary'
+import { ReturnCountdown } from '../components/ReturnCountdown'
 import { EmptyState, Notice, Skeleton, StatusPill } from '../components/ui/Bits'
 import { Stepper } from '../components/ui/Field'
 import { Modal } from '../components/ui/Modal'
@@ -43,7 +44,7 @@ export function OrderPage() {
   if (!res.data) {
     return (
       <div className="container">
-        <EmptyState level={1} icon={<WarningCircle size={36} />} title="Não encontramos essa reserva" action={<Link to="/minhas-reservas" className="btn btn--blue">Buscar minhas reservas</Link>}>
+        <EmptyState level={1} icon={<WarningCircle size={36} />} title="Não encontramos essa reserva" action={<Link to="/minhas-reservas" className="btn btn--blue">Buscar em Reservas</Link>}>
           Confira o código. Ele começa com LG e tem 7 caracteres, como no e-mail de confirmação.
         </EmptyState>
       </div>
@@ -70,7 +71,7 @@ function OrderView({ order, isNew }: { order: Order; isNew: boolean }) {
           <>
             <SealCheck size={44} weight="fill" className={styles.okIcon} aria-hidden="true" />
             <h1 className="display h1">Reserva confirmada, {firstName(order.customer.name)}!</h1>
-            <p className="lede">Suas malas estão separadas. Guardamos tudo em <Link to="/minhas-reservas" className="link">Minhas reservas</Link>; mostre o código abaixo na {order.fulfillment.type === 'entrega' ? 'entrega' : 'retirada'}.</p>
+            <p className="lede">Suas malas estão separadas. Guardamos tudo em <Link to="/minhas-reservas" className="link">Reservas</Link>; mostre o código abaixo na {order.fulfillment.type === 'entrega' ? 'entrega' : 'retirada'}.</p>
           </>
         ) : (
           <>
@@ -107,6 +108,8 @@ function OrderView({ order, isNew }: { order: Order; isNew: boolean }) {
         </div>
 
         <aside className={styles.side}>
+          <ReturnCountdown order={order} />
+
           <section className={styles.card} aria-labelledby="acoes">
             <h2 id="acoes" className={styles.cardTitle}>O que você pode fazer</h2>
             <div className={styles.actions}>

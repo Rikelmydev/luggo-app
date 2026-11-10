@@ -1,0 +1,7 @@
+.card { padding: clamp(18px, 2.4vw, 24px); border-radius: var(--radius-lg); background: var(--card); border: 1px solid var(--line); display: grid; gap: 4px; }
+.title { font-weight: 800; font-size: 1.125rem; }
+.big { font-weight: 850; font-stretch: 106%; font-size: 2rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.urgent { color: var(--danger); }
+.when { color: var(--ink-2); }
+.mail { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 20px 1fr; gap: 10px; font-size: 0.9375rem; color: var(--ink-2); }
+.body { display: grid; gap: 12px; }

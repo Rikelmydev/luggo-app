@@ -9,7 +9,7 @@ import { firstName, isEmail, isPhone, maskCep, maskPhone, money, moneyShort, plu
 import { inDeliveryArea, lookupCep } from '../services/cep'
 import { createOrder, earliestStart, validatePeriod } from '../services/orders'
 import { quote, rentalDays } from '../services/pricing'
-import { kv } from '../services/storage'
+import { CUSTOMER_KEY, kv } from '../services/storage'
 import { useBag } from '../state/bag'
 import { usePageTitle } from '../state/hooks'
 import { PaymentModal } from '../components/PaymentModal'
@@ -17,8 +17,6 @@ import { PriceSummary } from '../components/PriceSummary'
 import { Notice } from '../components/ui/Bits'
 import { Field } from '../components/ui/Field'
 import styles from './Checkout.module.css'
-
-const CUSTOMER_KEY = 'luggo:cliente:v1'
 
 interface AddressForm { cep: string; street: string; number: string; complement: string; district: string; city: string; uf: string }
 const emptyAddress: AddressForm = { cep: '', street: '', number: '', complement: '', district: '', city: '', uf: '' }

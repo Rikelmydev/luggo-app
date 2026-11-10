@@ -8,6 +8,7 @@ import type { ContactMessage, Customer, Fulfillment, Order, OrderStatus, Payment
 import { allocate, availableCount, canExtend, dailyAvailability, holdsUnits } from './availability'
 import { createPixCharge } from './payments'
 import { extensionQuote, quote, rentalDays } from './pricing'
+import { reminderDue } from './reminders'
 import { delay, readDB, updateDB } from './storage'
 
 const { operations, pricing } = BUSINESS
@@ -73,6 +74,20 @@ export async function listMyOrders(): Promise<Order[]> {
   return readDB()
     .orders.filter((o) => o.source === 'site')
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+}
+
+/** A reserva ainda está valendo? Mala com o cliente conta mesmo depois do prazo. */
+export function isActive(order: Order, now: Date = new Date()): boolean {
+  if (order.status === 'com_cliente') return true
+  const live = order.status === 'confirmado' || (order.status === 'aguardando_pagamento' && holdsUnits(order, now))
+  return live && order.end >= todayISO(now)
+}
+
+/** Malas em reservas pagas e ainda abertas: somam com a reserva em montagem no botão Reservas. */
+export function reservedCount(orders: Order[], now: Date = new Date()): number {
+  return orders
+    .filter((o) => o.source === 'site' && o.status !== 'aguardando_pagamento' && isActive(o, now))
+    .reduce((n, o) => n + o.items.reduce((sum, i) => sum + i.qty, 0), 0)
 }
 
 export async function getOrder(code: string): Promise<Order | undefined> {
@@ -279,12 +294,21 @@ export async function extendOrder(code: string, days: number): Promise<Result<Or
   const updated = patch(code, (o) => ({
     ...o,
     end: addDays(o.end, days),
+    returnReminder: undefined,
     extensions: [
       ...o.extensions,
       { days, amount, previousEnd: o.end, createdAt: at, payment: { method: 'pix', status: 'aprovado', amount, paidAt: at } },
     ],
   }))
   return { ok: true, value: updated }
+}
+
+/** Dispara (simulado) os lembretes de devolução que venceram e devolve os pedidos avisados. */
+export function sendDueReminders(now: Date = new Date()): Order[] {
+  const at = now.toISOString()
+  return readDB()
+    .orders.filter((o) => reminderDue(o, now))
+    .map((o) => patch(o.code, (cur) => ({ ...cur, returnReminder: { sentAt: at, to: cur.customer.email } })))
 }
 
 /* ---------- Área da equipe ---------- */

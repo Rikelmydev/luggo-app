@@ -1,27 +1,49 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { CaretRight, MagnifyingGlass, Suitcase } from '../components/ui/icons'
+import { CaretRight, MagnifyingGlass, SignOut, Suitcase } from '../components/ui/icons'
 import { COLOR_INFO, getModel } from '../data/catalog'
 import type { Order } from '../domain/types'
-import { formatWeekday, todayISO } from '../lib/dates'
+import { formatWeekday } from '../lib/dates'
 import { money } from '../lib/format'
-import { findOrder, listMyOrders } from '../services/orders'
+import { findOrder, isActive, listMyOrders } from '../services/orders'
+import { returnCountdown } from '../services/reminders'
+import { useAuth } from '../state/auth'
 import { useAsync, usePageTitle } from '../state/hooks'
+import { LoginCard } from '../components/LoginCard'
+import { ReservasTabs } from '../components/ReservasTabs'
 import { EmptyState, Notice, Skeleton, StatusPill } from '../components/ui/Bits'
 import { Field } from '../components/ui/Field'
 import styles from './MyOrders.module.css'
 
 export function MyOrders() {
-  usePageTitle('Minhas reservas')
+  usePageTitle('Reservas')
+  const { session } = useAuth()
+  return (
+    <>
+      <ReservasTabs />
+      <div className={`container ${styles.page}`}>
+        <h1 className="display h1">Reservas</h1>
+        {session ? <Orders /> : <div className={styles.login}><LoginCard /></div>}
+      </div>
+    </>
+  )
+}
+
+function Orders() {
+  const { session, signOut } = useAuth()
   const res = useAsync(() => listMyOrders(), [])
   const orders = res.data ?? []
-  const today = todayISO()
-  const active = orders.filter((o) => ['aguardando_pagamento', 'confirmado', 'com_cliente'].includes(o.status) && o.end >= today)
+  const active = orders.filter((o) => isActive(o))
   const past = orders.filter((o) => !active.includes(o))
 
   return (
-    <div className={`container ${styles.page}`}>
-      <h1 className="display h1">Minhas reservas</h1>
+    <>
+      <p className={styles.account}>
+        Entrou como <strong>{session!.name}</strong>
+        <button type="button" className={`link ${styles.signOut}`} onClick={signOut}>
+          <SignOut size={18} aria-hidden="true" /> Sair
+        </button>
+      </p>
       <div className={styles.layout}>
         <div className={styles.lists}>
           {res.status === 'loading' && !res.data ? (
@@ -44,7 +66,7 @@ export function MyOrders() {
           <FindForm />
         </aside>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -53,24 +75,32 @@ function Group({ title, orders }: { title: string; orders: Order[] }) {
     <section className={styles.group} aria-label={title}>
       <h2 className={styles.groupTitle}>{title}</h2>
       <ul className={styles.list}>
-        {orders.map((o) => (
-          <li key={o.code}>
-            <Link to={`/pedido/${o.code}`} className={styles.row}>
-              <div className={styles.rowMain}>
-                <p className={styles.rowTop}>
-                  <span className={styles.code}>{o.code}</span>
-                  <StatusPill status={o.status} />
-                </p>
-                <p className={styles.dates}>{formatWeekday(o.start)} até {formatWeekday(o.end)}</p>
-                <p className={styles.items}>
-                  {o.items.map((i) => `${i.qty > 1 ? `${i.qty} × ` : ''}${getModel(i.modelId)?.name}${i.color ? ` ${COLOR_INFO[i.color].label}` : ''}`).join(', ')}
-                </p>
-              </div>
-              <p className={`${styles.total} num`}>{money(o.price.total)}</p>
-              <CaretRight size={20} aria-hidden="true" className={styles.caret} />
-            </Link>
-          </li>
-        ))}
+        {orders.map((o) => {
+          const count = returnCountdown(o)
+          return (
+            <li key={o.code}>
+              <Link to={`/pedido/${o.code}`} className={styles.row}>
+                <div className={styles.rowMain}>
+                  <p className={styles.rowTop}>
+                    <span className={styles.code}>{o.code}</span>
+                    <StatusPill status={o.status} />
+                  </p>
+                  <p className={styles.dates}>{formatWeekday(o.start)} até {formatWeekday(o.end)}</p>
+                  <p className={styles.items}>
+                    {o.items.map((i) => `${i.qty > 1 ? `${i.qty} × ` : ''}${getModel(i.modelId)?.name}${i.color ? ` ${COLOR_INFO[i.color].label}` : ''}`).join(', ')}
+                  </p>
+                  {count && (
+                    <p className={`${styles.countdown} ${count.urgent ? styles.urgent : ''}`}>
+                      {count.late ? 'Passou do prazo de devolução' : `${count.label} para a devolução`}
+                    </p>
+                  )}
+                </div>
+                <p className={`${styles.total} num`}>{money(o.price.total)}</p>
+                <CaretRight size={20} aria-hidden="true" className={styles.caret} />
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

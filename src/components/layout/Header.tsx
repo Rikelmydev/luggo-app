@@ -1,24 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router'
-import { List, Suitcase, X } from '../ui/icons'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router'
+import { ArrowLeft, List, Suitcase, X } from '../ui/icons'
 import { useReducedMotion } from 'motion/react'
 import * as m from 'motion/react-m'
+import { reservedCount } from '../../services/orders'
 import { useBag } from '../../state/bag'
+import { useDB } from '../../state/hooks'
 import { BrandMark } from './Brand'
 import styles from './Header.module.css'
 
 const LINKS = [
   { to: '/malas', label: 'Malas' },
   { to: '/como-funciona', label: 'Como funciona' },
-  { to: '/perguntas', label: 'Perguntas' },
-  { to: '/minhas-reservas', label: 'Minhas reservas' },
 ]
 
 export function Header({ overHero }: { overHero: boolean }) {
-  const { count } = useBag()
+  const { count: inBag } = useBag()
+  const { orders } = useDB()
+  // O botão soma o que está em montagem com o que já foi pago: confirmar não pode zerar a contagem.
+  const count = inBag + reservedCount(orders)
+  // Com malas por fechar, abre a reserva em montagem (sem login); senão, as reservas feitas.
+  const reservasTo = inBag > 0 ? '/reserva' : '/minhas-reservas'
   const [solid, setSolid] = useState(!overHero)
   const [menu, setMenu] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const reduce = useReducedMotion()
   const firstCount = useRef(count)
 
@@ -56,6 +62,17 @@ export function Header({ overHero }: { overHero: boolean }) {
     <>
       <header data-chrome className={`${styles.header} ${solid || menu ? styles.solid : ''}`}>
         <div className={`container ${styles.inner}`}>
+          {!overHero && (
+            <button
+              type="button"
+              className={styles.back}
+              aria-label="Voltar"
+              // Quem entrou direto por um link não tem para onde voltar nesta aba: vai ao início.
+              onClick={() => (location.key === 'default' ? navigate('/') : navigate(-1))}
+            >
+              <ArrowLeft size={20} weight="bold" aria-hidden="true" />
+            </button>
+          )}
           <Link to="/" className={styles.brand} aria-label="Luggo, página inicial">
             <BrandMark />
           </Link>
@@ -66,9 +83,9 @@ export function Header({ overHero }: { overHero: boolean }) {
               </NavLink>
             ))}
           </nav>
-          <Link to="/reserva" className={styles.bag} aria-label={`Minha reserva, ${count} ${count === 1 ? 'mala' : 'malas'}`}>
+          <Link to={reservasTo} className={styles.bag} aria-label={`Reservas, ${count} ${count === 1 ? 'mala' : 'malas'}`}>
             <Suitcase size={22} weight="bold" aria-hidden="true" />
-            <span className={styles.bagLabel}>Reserva</span>
+            <span className={styles.bagLabel}>Reservas</span>
             <m.span
               key={count}
               className={styles.count}
@@ -100,7 +117,7 @@ export function Header({ overHero }: { overHero: boolean }) {
           ))}
           <Link to="/sobre">Sobre a Luggo</Link>
           <Link to="/contato">Contato</Link>
-          <Link to="/reserva" className="btn btn--yellow btn--lg">Ver minha reserva ({count})</Link>
+          <Link to={reservasTo} className="btn btn--yellow btn--lg">Reservas ({count})</Link>
         </nav>
       </div>
     </>

@@ -14,13 +14,11 @@ import {
   XCircle,
 } from '../components/ui/icons'
 import { BUSINESS } from '../config/business'
-import { FAQ } from '../data/faq'
 import { MODELS } from '../data/catalog'
 import { isEmail, money, moneyShort } from '../lib/format'
 import { sendContact } from '../services/orders'
 import { usePageTitle } from '../state/hooks'
 import { PageIntro } from '../components/layout/PageIntro'
-import { Accordion } from '../components/ui/Accordion'
 import { Notice } from '../components/ui/Bits'
 import { Field, TextArea } from '../components/ui/Field'
 import styles from './InfoPages.module.css'
@@ -67,34 +65,6 @@ export function HowItWorks() {
     </>
   )
 }
-
-/* ---------- Perguntas ---------- */
-export function FaqPage() {
-  usePageTitle('Perguntas frequentes')
-  return (
-    <>
-      <PageIntro title="Perguntas frequentes">
-        Não achou a sua? <Link to="/contato">Fale com a gente</Link>.
-      </PageIntro>
-      <div className={`container ${styles.section} ${styles.faq}`}>
-        <nav className={styles.toc} aria-label="Temas">
-          {FAQ.map((g) => (
-            <a key={g.title} href={`#${slug(g.title)}`}>{g.title}</a>
-          ))}
-        </nav>
-        <div className={styles.faqGroups}>
-          {FAQ.map((g) => (
-            <section key={g.title} id={slug(g.title)} aria-labelledby={`${slug(g.title)}-t`}>
-              <h2 id={`${slug(g.title)}-t`} className="h3">{g.title}</h2>
-              <Accordion items={g.items} />
-            </section>
-          ))}
-        </div>
-      </div>
-    </>
-  )
-}
-const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-')
 
 /* ---------- Termos ---------- */
 export function Terms() {

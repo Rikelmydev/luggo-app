@@ -12,6 +12,8 @@ export interface DB {
 }
 
 const DB_KEY = 'luggo:db:v1'
+/** Últimos dados digitados no pagamento: preenchem a próxima compra e o login. */
+export const CUSTOMER_KEY = 'luggo:cliente:v1'
 const memory = new Map<string, string>()
 
 export const kv = {

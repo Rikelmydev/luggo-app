@@ -122,8 +122,11 @@
 /* ---------- FAQ ---------- */
 .faq { padding: clamp(64px, 10vw, 112px) 0; }
 .faqGrid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 40px; }
+.faqHead { align-self: start; position: sticky; top: calc(var(--nav-h) + 24px); }
 .allFaq { display: inline-block; margin-top: 18px; }
-@media (max-width: 899px) { .faqGrid { grid-template-columns: 1fr; gap: 24px; } }
+.faqGroups { display: grid; gap: 32px; }
+.faqGroupTitle { font-weight: 800; font-size: 1.125rem; margin-bottom: 8px; }
+@media (max-width: 899px) { .faqGrid { grid-template-columns: 1fr; gap: 24px; } .faqHead { position: static; } }
 
 /* ---------- Closing ---------- */
 .closing { position: relative; overflow: clip; background: var(--paper); padding-top: clamp(48px, 8vw, 96px); }

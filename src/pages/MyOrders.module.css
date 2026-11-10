@@ -1,4 +1,10 @@
 .page { padding-block: clamp(28px, 4vw, 48px) clamp(56px, 8vw, 96px); }
+.login { margin-top: 28px; }
+.account { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; color: var(--ink-2); }
+.account strong { color: var(--ink); }
+.signOut { display: inline-flex; align-items: center; gap: 6px; }
+.countdown { font-weight: 720; font-size: 0.9375rem; color: var(--accent-ink); }
+.urgent { color: var(--danger); }
 .layout { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 28px; align-items: start; }
 .lists { display: grid; gap: 28px; min-width: 0; }
 .skeletons { display: grid; gap: 12px; }

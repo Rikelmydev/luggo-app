@@ -43,10 +43,14 @@ export const BUSINESS = {
     maxAdvanceDays: 180,
     maxDays: 60,
     deliveryWindows: [
-      { id: 'manha', label: 'Manhã', time: '8h às 12h' },
-      { id: 'tarde', label: 'Tarde', time: '12h às 16h' },
-      { id: 'noite', label: 'Noite', time: '16h às 20h' },
+      { id: 'manha', label: 'Manhã', time: '8h às 12h', endHour: 12 },
+      { id: 'tarde', label: 'Tarde', time: '12h às 16h', endHour: 16 },
+      { id: 'noite', label: 'Noite', time: '16h às 20h', endHour: 20 },
     ],
+    /** Hora em que a loja fecha, limite para devolver no último dia. */
+    storeCloseHour: { weekday: 20, saturday: 15 },
+    /** Quantas horas antes do fim do aluguel sai o e-mail de lembrete. */
+    returnReminderHours: 24,
   },
 
   /** Entrega só na capital. Faixas de CEP usadas quando o ViaCEP não responde. */
