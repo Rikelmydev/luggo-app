@@ -21,7 +21,7 @@ export const FAQ: FaqGroup[] = [
     items: [
       { q: 'Onde vocês entregam?', a: `Em toda a capital de São Paulo. A entrega e a coleta custam ${moneyShort(pricing.deliveryFee)} por pedido, juntas. Fora da capital, a retirada é na loja.` },
       { q: 'Como funciona a entrega?', a: 'Você escolhe uma janela de horário (manhã, tarde ou noite) para receber e combinamos a coleta no último dia, na mesma janela. Alguém precisa estar no endereço.' },
-      { q: 'Onde fica a loja?', a: `${BUSINESS.store.address}. ${BUSINESS.store.landmark}.` },
+      { q: 'Onde fica a loja?', a: `${BUSINESS.store.address}, ${BUSINESS.store.landmark.toLowerCase()}.` },
       { q: 'E se eu voltar antes?', a: 'Pode devolver antes, sem problema. O valor das diárias não usadas não é devolvido.' },
     ],
   },

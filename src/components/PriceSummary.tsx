@@ -1,5 +1,7 @@
 import type { PriceBreakdown } from '../domain/types'
-import { money, plural } from '../lib/format'
+import { BUSINESS } from '../config/business'
+import { money, moneyShort, plural } from '../lib/format'
+import { priceFormula } from '../services/pricing'
 import styles from './PriceSummary.module.css'
 
 interface Props {
@@ -15,11 +17,8 @@ export function PriceSummary({ price, deliveryNote, totalLabel = 'Total' }: Prop
       {price.lines.map((l) => (
         <div key={l.label} className={styles.row}>
           <dt>
-            {l.qty > 1 ? `${l.qty} × ` : ''}
             {l.label}
-            <span className={styles.sub}>
-              {plural(l.days, 'diária', 'diárias')} de {money(l.daily)}
-            </span>
+            <span className={styles.sub}>{priceFormula(l.modelId, l.qty, l.days)}</span>
           </dt>
           <dd className="num">{money(l.subtotal)}</dd>
         </div>
@@ -32,7 +31,7 @@ export function PriceSummary({ price, deliveryNote, totalLabel = 'Total' }: Prop
       )}
       {price.protection > 0 && (
         <div className={styles.row}>
-          <dt>Proteção Luggo<span className={styles.sub}>{plural(price.units, 'mala', 'malas')}, {plural(price.days, 'dia', 'dias')}</span></dt>
+          <dt>Proteção Luggo<span className={styles.sub}>{plural(price.units, 'mala', 'malas')} × {plural(price.days, 'diária', 'diárias')} × {moneyShort(BUSINESS.pricing.protectionPerDay)}</span></dt>
           <dd className="num">{money(price.protection)}</dd>
         </div>
       )}

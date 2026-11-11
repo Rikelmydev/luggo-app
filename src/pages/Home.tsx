@@ -23,8 +23,10 @@ import { CepCheck } from '../components/CepCheck'
 import { DatesField } from '../components/DatesField'
 import { SuitcaseStage } from '../components/SuitcaseStage'
 import { Accordion } from '../components/ui/Accordion'
-import travelers from '../assets/img/viajantes.svg'
+import travelers from '../assets/img/viajantes.webp'
 import styles from './Home.module.css'
+
+const [TRAVELERS_W, TRAVELERS_H] = [900, 946]
 
 const SIZE_FILTERS: { value: '' | Size | 'kit'; label: string }[] = [
   { value: '', label: 'Todas' },
@@ -77,7 +79,7 @@ function Hero() {
             <span>Alugue a mala.</span> <span>Viaje. Devolva.</span>
           </h1>
           <p className={styles.heroLead}>
-            Malas de qualidade por período em São Paulo. Receba em casa ou retire na loja perto do metrô Ana Rosa.
+            Malas de qualidade por período em São Paulo. Receba em casa ou retire na loja, no caminho da sua viagem.
           </p>
           <form
             className={styles.search}
@@ -139,7 +141,7 @@ function Sizes() {
   const heights: Record<Size, number> = { P: 55, M: 65, G: 76 }
   const sample: Record<Size, keyof typeof COLOR_INFO> = { P: 'azul', M: 'laranja', G: 'grafite' }
   return (
-    <section className={styles.sizesSec} aria-labelledby="tamanhos-titulo">
+    <section id="malas" className={styles.sizesSec} aria-labelledby="tamanhos-titulo">
       <div className={`container ${styles.sizesGrid}`}>
         <div className={styles.sizesCopy}>
           <h2 id="tamanhos-titulo" className="display h2">Três tamanhos, lado a lado</h2>
@@ -150,6 +152,7 @@ function Sizes() {
               <strong>Kits Casal e Família</strong> saem até {moneyShort(10)} por dia mais baratos que as malas avulsas
             </span>
           </Link>
+          <Link to="/malas" className={`link ${styles.allBags}`}>Ver todas as malas e preços</Link>
         </div>
         <ul className={styles.lineup}>
           {(['P', 'M', 'G'] as Size[]).map((size) => (
@@ -274,6 +277,7 @@ function Closing() {
   return (
     <section className={styles.closing}>
       <div className={`container ${styles.closingGrid}`}>
+        <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas caminhando de mãos dadas, uma delas puxando uma mala amarela" width={TRAVELERS_W} height={TRAVELERS_H} loading="lazy" />
         <div className={styles.closingCopy}>
           <p className={`display ${styles.manifesto}`}>A Luggo não vende malas. Vende a liberdade de viajar.</p>
           <div className={styles.closingActions}>
@@ -281,7 +285,6 @@ function Closing() {
             <Link to={`/malas/${mostRented.id}`} className="link">Ver a mais alugada</Link>
           </div>
         </div>
-        <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas caminhando, uma delas puxando uma mala amarela" width={780} height={718} loading="lazy" />
       </div>
     </section>
   )

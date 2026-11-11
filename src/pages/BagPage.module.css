@@ -14,6 +14,8 @@
 .name a { color: inherit; text-decoration: none; }
 .name a:hover { color: var(--accent-ink); }
 .meta { color: var(--ink-2); font-size: 0.875rem; }
+.formula { color: var(--ink-2); font-size: 0.875rem; }
+.formula strong { color: var(--ink); }
 .short { color: var(--danger); font-size: 0.875rem; font-weight: 650; }
 .controls { display: grid; justify-items: end; gap: 6px; }
 .lineTotal { font-weight: 780; }

@@ -7,7 +7,7 @@ export const BUSINESS = {
   store: {
     name: 'Loja Luggo Vila Mariana',
     address: 'Rua Domingos de Morais, Vila Mariana, São Paulo',
-    landmark: 'A 2 minutos do metrô Ana Rosa (linhas 1-Azul e 2-Verde)',
+    landmark: 'No caminho da sua casa e da sua viagem',
     hours: [
       { days: 'Segunda a sexta', time: '8h às 20h' },
       { days: 'Sábado', time: '9h às 15h' },

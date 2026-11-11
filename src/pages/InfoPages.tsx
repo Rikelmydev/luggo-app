@@ -208,7 +208,7 @@ export function About() {
       <div className={`container ${styles.section} ${styles.about}`}>
         <div className={styles.aboutText}>
           <p className="lede">Quem viaja uma ou duas vezes por ano compra uma mala boa, usa por alguns dias e guarda o resto do ano num armário que já não tem espaço. Em São Paulo, onde muita gente mora em estúdio ou apartamento dividido, isso pesa.</p>
-          <p>A Luggo nasceu em 2026 como projeto de empreendedorismo de três estudantes com uma ideia simples: transformar a mala em serviço. Você aluga pelo tempo da viagem, recebe em casa ou retira perto do metrô, e devolve. Cada mala volta, é higienizada e sai de novo, em vez de ficar parada.</p>
+          <p>A Luggo nasceu em 2026 como projeto de empreendedorismo de três estudantes com uma ideia simples: transformar a mala em serviço. Você aluga pelo tempo da viagem, recebe em casa ou retira na loja, no caminho da viagem, e devolve. Cada mala volta, é higienizada e sai de novo, em vez de ficar parada.</p>
           <p>Começamos com {units} malas de {MODELS.filter((m) => m.kind !== 'kit').length} modelos, uma loja na Vila Mariana e entrega na capital. O próximo passo são totens de autoatendimento em rodoviárias e estações, como Barra Funda e Tietê.</p>
         </div>
         <section aria-labelledby="time">

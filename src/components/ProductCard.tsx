@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { COLOR_INFO, SIZE_INFO, kitListDaily, modelImage, type Color, type Model } from '../data/catalog'
 import { money, moneyShort, plural } from '../lib/format'
-import { periodPrice } from '../services/pricing'
+import { discountFor, periodPrice } from '../services/pricing'
 import styles from './ProductCard.module.css'
 
 interface Props {
@@ -32,6 +32,7 @@ export function ProductCard({ model, days, available }: Props) {
             : model.summary}
         </p>
 
+        {model.colors.length === 0 && <p className={styles.assorted}>Cores sortidas</p>}
         {model.colors.length > 0 && (
           <div className={styles.swatches} role="radiogroup" aria-label={`Cor da ${model.name}`}>
             {model.colors.map((c) => (
@@ -57,7 +58,8 @@ export function ProductCard({ model, days, available }: Props) {
           </p>
           {days > 0 && (
             <p className={styles.period}>
-              {money(periodPrice(model.id, 1, days))} por {plural(days, 'diária', 'diárias')}
+              {plural(days, 'diária', 'diárias')} × {moneyShort(model.daily)} = <strong className={`${styles.total} num`}>{money(model.daily * days)}</strong>
+              {discountFor(days) > 0 && <>, com {Math.round(discountFor(days) * 100)}% off: {money(periodPrice(model.id, 1, days))}</>}
             </p>
           )}
         </div>

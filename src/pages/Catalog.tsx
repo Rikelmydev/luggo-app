@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { MagnifyingGlass } from '../components/ui/icons'
+import { MagnifyingGlass, SlidersHorizontal } from '../components/ui/icons'
 import { MODELS, type Kind, type Size } from '../data/catalog'
 import { useBag } from '../state/bag'
 import { useDataVersion, usePageTitle } from '../state/hooks'
@@ -34,6 +34,8 @@ export function Catalog() {
   const kind = (params.get('tipo') ?? '') as '' | Exclude<Kind, 'kit'>
   const sort = params.get('ordem') ?? 'tamanho'
   const onlyAvailable = params.get('livres') === '1'
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const activeFilters = [size, kind, sort !== 'tamanho', onlyAvailable].filter(Boolean).length
 
   const hasDates = !!(bag.start && bag.end)
   const periodError = hasDates ? validatePeriod(bag.start, bag.end) : null
@@ -79,35 +81,44 @@ export function Catalog() {
           <div className={styles.dates}>
             <DatesField start={bag.start} end={bag.end} onChange={bag.setDates} />
           </div>
-          <div className={styles.filters}>
-            <div className={styles.chips} role="radiogroup" aria-label="Tamanho">
-              {SIZES.map((s) => (
-                <button key={s.label} type="button" role="radio" aria-checked={size === s.value} className={styles.chip} onClick={() => set('tamanho', s.value)}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-            <div className={styles.selects}>
-              <label className={styles.select}>
-                <span className="sr-only">Tipo</span>
-                <select value={kind} onChange={(e) => set('tipo', e.target.value)} disabled={size === 'kit'}>
-                  {KINDS.map((k) => <option key={k.label} value={k.value}>{k.label}</option>)}
-                </select>
+          <button type="button" className={styles.filterBtn} aria-expanded={filtersOpen} aria-controls="filtros" onClick={() => setFiltersOpen((o) => !o)}>
+            <SlidersHorizontal size={20} aria-hidden="true" />
+            Filtros
+            {activeFilters > 0 && <span className={styles.badge}>{activeFilters}</span>}
+          </button>
+        </div>
+        {/* Os filtros ficam guardados atrás de um botão; aparecem só quando a pessoa pede. */}
+        <div id="filtros" className={`container ${styles.filters}`} hidden={!filtersOpen}>
+          <div className={styles.chips} role="radiogroup" aria-label="Tamanho">
+            {SIZES.map((s) => (
+              <button key={s.label} type="button" role="radio" aria-checked={size === s.value} className={styles.chip} onClick={() => set('tamanho', s.value)}>
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <div className={styles.selects}>
+            <label className={styles.select}>
+              <span className="sr-only">Tipo</span>
+              <select value={kind} onChange={(e) => set('tipo', e.target.value)} disabled={size === 'kit'}>
+                {KINDS.map((k) => <option key={k.label} value={k.value}>{k.label}</option>)}
+              </select>
+            </label>
+            <label className={styles.select}>
+              <span className="sr-only">Ordenar</span>
+              <select value={sort} onChange={(e) => set('ordem', e.target.value === 'tamanho' ? '' : e.target.value)}>
+                <option value="tamanho">Ordenar por tamanho</option>
+                <option value="preco">Menor preço</option>
+              </select>
+            </label>
+            {days > 0 && (
+              <label className={styles.toggle}>
+                <input type="checkbox" checked={onlyAvailable} onChange={(e) => set('livres', e.target.checked ? '1' : '')} />
+                Só livres
               </label>
-              <label className={styles.select}>
-                <span className="sr-only">Ordenar</span>
-                <select value={sort} onChange={(e) => set('ordem', e.target.value === 'tamanho' ? '' : e.target.value)}>
-                  <option value="tamanho">Ordenar por tamanho</option>
-                  <option value="preco">Menor preço</option>
-                </select>
-              </label>
-              {days > 0 && (
-                <label className={styles.toggle}>
-                  <input type="checkbox" checked={onlyAvailable} onChange={(e) => set('livres', e.target.checked ? '1' : '')} />
-                  Só livres
-                </label>
-              )}
-            </div>
+            )}
+            {activeFilters > 0 && (
+              <button type="button" className={`link ${styles.clear}`} onClick={() => setParams({}, { replace: true })}>Limpar filtros</button>
+            )}
           </div>
         </div>
       </div>

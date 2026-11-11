@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { discountFor, extensionQuote, lateFeePerDay, periodPrice, quote, rentalDays } from './pricing'
+import { moneyShort } from '../lib/format'
+import { discountFor, extensionQuote, lateFeePerDay, periodPrice, priceFormula, quote, rentalDays } from './pricing'
 
 describe('rentalDays', () => {
   it('conta as diárias entre retirada e devolução', () => {
@@ -57,5 +58,13 @@ describe('extensões e atrasos', () => {
   })
   it('mostra o preço do período com desconto', () => {
     expect(periodPrice('media-rigida', 1, 14)).toBe(201.6)
+  })
+})
+
+describe('conta por extenso', () => {
+  it('mostra quantidade, diárias e diária', () => {
+    expect(priceFormula('media-rigida', 3, 6)).toBe(`3 malas × 6 diárias × ${moneyShort(18)}`)
+    expect(priceFormula('bordo-rigida', 1, 1)).toBe(`1 mala × 1 diária × ${moneyShort(14)}`)
+    expect(priceFormula('kit-casal', 2, 4)).toBe(`2 kits × 4 diárias × ${moneyShort(32)}`)
   })
 })

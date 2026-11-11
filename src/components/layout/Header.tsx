@@ -9,11 +9,6 @@ import { useDB } from '../../state/hooks'
 import { BrandMark } from './Brand'
 import styles from './Header.module.css'
 
-const LINKS = [
-  { to: '/malas', label: 'Malas' },
-  { to: '/como-funciona', label: 'Como funciona' },
-]
-
 export function Header({ overHero }: { overHero: boolean }) {
   const { count: inBag } = useBag()
   const { orders } = useDB()
@@ -23,10 +18,12 @@ export function Header({ overHero }: { overHero: boolean }) {
   const reservasTo = inBag > 0 ? '/reserva' : '/minhas-reservas'
   const [solid, setSolid] = useState(!overHero)
   const [menu, setMenu] = useState(false)
+  const [away, setAway] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const reduce = useReducedMotion()
   const firstCount = useRef(count)
+  const hidden = away && !menu
 
   // Transparente sobre o azul do início; sólida assim que a página rola.
   useEffect(() => {
@@ -41,7 +38,26 @@ export function Header({ overHero }: { overHero: boolean }) {
     return () => io.disconnect()
   }, [overHero, location.pathname])
 
-  useEffect(() => setMenu(false), [location.pathname])
+  // Some ao descer a página e volta ao primeiro movimento para cima.
+  useEffect(() => {
+    let last = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      if (Math.abs(y - last) < 6) return
+      setAway(y > last && y > 120)
+      last = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // As barras fixas das páginas sobem junto quando o cabeçalho some.
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-header-hidden', hidden)
+  }, [hidden])
+
+  // Fecha o menu a cada navegação, inclusive para uma seção da própria página.
+  useEffect(() => setMenu(false), [location.key])
 
   useEffect(() => {
     if (!menu) return
@@ -58,10 +74,20 @@ export function Header({ overHero }: { overHero: boolean }) {
     }
   }, [menu])
 
+  // Malas desce até a seção da página principal; o catálogo completo segue em /malas.
+  const malas = (
+    <Link to="/" state={{ section: 'malas' }} preventScrollReset className={location.pathname.startsWith('/malas') ? styles.active : undefined}>
+      Malas
+    </Link>
+  )
+
   return (
     <>
-      <header data-chrome className={`${styles.header} ${solid || menu ? styles.solid : ''}`}>
+      <header data-chrome className={`${styles.header} ${solid || menu ? styles.solid : ''} ${hidden ? styles.away : ''}`}>
         <div className={`container ${styles.inner}`}>
+          <Link to="/" className={styles.brand} aria-label="Luggo, página inicial">
+            <BrandMark />
+          </Link>
           {!overHero && (
             <button
               type="button"
@@ -70,18 +96,14 @@ export function Header({ overHero }: { overHero: boolean }) {
               // Quem entrou direto por um link não tem para onde voltar nesta aba: vai ao início.
               onClick={() => (location.key === 'default' ? navigate('/') : navigate(-1))}
             >
-              <ArrowLeft size={20} weight="bold" aria-hidden="true" />
+              <ArrowLeft size={22} weight="bold" aria-hidden="true" />
             </button>
           )}
-          <Link to="/" className={styles.brand} aria-label="Luggo, página inicial">
-            <BrandMark />
-          </Link>
           <nav className={styles.links} aria-label="Principal">
-            {LINKS.map((l) => (
-              <NavLink key={l.to} to={l.to} className={({ isActive }) => (isActive ? styles.active : undefined)}>
-                {l.label}
-              </NavLink>
-            ))}
+            {malas}
+            <NavLink to="/como-funciona" className={({ isActive }) => (isActive ? styles.active : undefined)}>
+              Como funciona
+            </NavLink>
           </nav>
           <Link to={reservasTo} className={styles.bag} aria-label={`Reservas, ${count} ${count === 1 ? 'mala' : 'malas'}`}>
             <Suitcase size={22} weight="bold" aria-hidden="true" />
@@ -112,9 +134,8 @@ export function Header({ overHero }: { overHero: boolean }) {
       {/* Fora do <header>: o desfoque da barra prenderia um elemento fixo dentro dela. */}
       <div id="menu-celular" className={styles.menu} hidden={!menu}>
         <nav aria-label="Menu">
-          {LINKS.map((l) => (
-            <Link key={l.to} to={l.to}>{l.label}</Link>
-          ))}
+          {malas}
+          <Link to="/como-funciona">Como funciona</Link>
           <Link to="/sobre">Sobre a Luggo</Link>
           <Link to="/contato">Contato</Link>
           <Link to={reservasTo} className="btn btn--yellow btn--lg">Reservas ({count})</Link>

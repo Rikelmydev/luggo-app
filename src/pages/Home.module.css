@@ -67,6 +67,7 @@
   transition: transform .2s var(--ease-out);
 }
 .kitLink:hover { transform: translateY(-2px); }
+.allBags { display: inline-block; margin-top: 18px; }
 .kitLink svg { flex: none; color: var(--accent-ink); margin-top: 2px; }
 .lineup { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; }
 .sizeCol { display: grid; gap: 4px; text-decoration: none; color: var(--ink); height: 100%; }
@@ -122,7 +123,7 @@
 /* ---------- FAQ ---------- */
 .faq { padding: clamp(64px, 10vw, 112px) 0; }
 .faqGrid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 40px; }
-.faqHead { align-self: start; position: sticky; top: calc(var(--nav-h) + 24px); }
+.faqHead { align-self: start; position: sticky; top: calc(var(--header-offset) + 24px); transition: top .3s var(--ease-out); }
 .allFaq { display: inline-block; margin-top: 18px; }
 .faqGroups { display: grid; gap: 32px; }
 .faqGroupTitle { font-weight: 800; font-size: 1.125rem; margin-bottom: 8px; }
@@ -131,15 +132,16 @@
 /* ---------- Closing ---------- */
 .closing { position: relative; overflow: clip; background: var(--paper); padding-top: clamp(48px, 8vw, 96px); }
 .closing::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: var(--blue); }
-.closingGrid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 24px; }
-.closingCopy { align-self: start; padding-bottom: 170px; }
+.closingGrid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: end; }
+.closingCopy { align-self: center; padding-bottom: 140px; }
 .manifesto { font-size: clamp(2.25rem, 1.2rem + 3.4vw, 4rem); color: var(--blue); max-width: 14ch; }
 @media (prefers-color-scheme: dark) { .manifesto { color: #fff; } }
 .closingActions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
-.travelers { align-self: end; justify-self: end; width: 100%; max-width: 520px; height: auto; }
+/* A ilustração fica inteira, alinhada ao começo do conteúdo, com os pés na faixa azul. */
+.travelers { justify-self: start; width: 100%; max-width: 440px; height: auto; }
 @media (max-width: 899px) {
   .closingGrid { grid-template-columns: 1fr; }
-  .closingCopy { padding-bottom: 8px; }
-  .travelers { max-width: 340px; }
+  .closingCopy { order: -1; padding-bottom: 8px; }
+  .travelers { max-width: 300px; }
   .closing::after { height: 80px; }
 }

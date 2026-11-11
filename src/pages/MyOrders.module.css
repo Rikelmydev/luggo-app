@@ -24,7 +24,7 @@
 .items { color: var(--ink-2); font-size: 0.875rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .total { font-weight: 800; }
 .caret { color: var(--ink-3); }
-.find { position: sticky; top: calc(var(--nav-h) + 16px); display: grid; gap: 14px; padding: 22px; border-radius: var(--radius-lg); background: var(--paper-2); }
+.find { position: sticky; top: calc(var(--header-offset) + 16px); transition: top .3s var(--ease-out); display: grid; gap: 14px; padding: 22px; border-radius: var(--radius-lg); background: var(--paper-2); }
 .find button { justify-self: start; }
 @media (max-width: 899px) { .layout { grid-template-columns: 1fr; } .find { position: static; } }
 @media (max-width: 520px) { .row { grid-template-columns: 1fr auto; } .caret { display: none; } }

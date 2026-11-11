@@ -1,7 +1,7 @@
 import { BUSINESS } from '../config/business'
 import { getModel, unitsPerItem } from '../data/catalog'
 import { diffDays, type ISODate } from '../lib/dates'
-import { cents } from '../lib/format'
+import { cents, moneyShort, plural } from '../lib/format'
 import type { PriceBreakdown } from '../domain/types'
 
 const { pricing } = BUSINESS
@@ -79,6 +79,13 @@ export function extensionQuote(items: { modelId: string; qty: number }[], extraD
 export function lateFeePerDay(items: { modelId: string; qty: number }[]): number {
   const daily = items.reduce((s, i) => s + (getModel(i.modelId)?.daily ?? 0) * i.qty, 0)
   return cents(daily * pricing.extraDayFactor)
+}
+
+/** A conta por extenso, para ninguém precisar fazer de cabeça: "3 malas × 6 diárias × R$ 18". */
+export function priceFormula(modelId: string, qty: number, days: number): string {
+  const model = getModel(modelId)
+  const [one, many] = model?.kind === 'kit' ? ['kit', 'kits'] : ['mala', 'malas']
+  return `${plural(qty, one, many)} × ${plural(days, 'diária', 'diárias')} × ${moneyShort(model?.daily ?? 0)}`
 }
 
 /** Preço total de um modelo no período, já com o desconto progressivo. */
