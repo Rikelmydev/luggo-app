@@ -147,11 +147,11 @@
 .closingArt { position: relative; justify-self: start; width: 100%; max-width: 600px; }
 .sun { position: absolute; left: 8%; top: 9%; width: 78%; aspect-ratio: 1; border-radius: 50%; background: var(--yellow); }
 .route { position: absolute; left: -2%; top: -4%; width: 104%; height: auto; overflow: visible; }
-.route path { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 12; }
-.plane { position: absolute; right: -1%; top: 11%; width: 38px; height: 38px; color: var(--blue); transform: rotate(28deg); }
+.route > path { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 12; }
+.plane { color: var(--blue); }
 .travelers { position: relative; display: block; width: 100%; height: auto; }
 @media (prefers-color-scheme: dark) {
-  .route path { stroke: var(--on-blue-2); opacity: .7; }
+  .route > path { stroke: var(--on-blue-2); opacity: .7; }
   .plane { color: var(--yellow); }
 }
 

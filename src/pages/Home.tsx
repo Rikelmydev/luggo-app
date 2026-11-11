@@ -26,10 +26,10 @@ import { IdleYear } from '../components/IdleYear'
 import { DatesField } from '../components/DatesField'
 import { SuitcaseStage } from '../components/SuitcaseStage'
 import { Accordion } from '../components/ui/Accordion'
-import travelers from '../assets/img/viajantes.webp'
+import travelers from '../assets/img/viajantes.svg'
 import styles from './Home.module.css'
 
-const [TRAVELERS_W, TRAVELERS_H] = [1200, 1264]
+const [TRAVELERS_W, TRAVELERS_H] = [900, 1025]
 
 /** Marca um bloco para entrar ao rolar; i atrasa um pouco cada item de uma lista. */
 const reveal = (i = 0) => ({ 'data-reveal': '', style: { '--i': i } as CSSProperties })
@@ -305,9 +305,12 @@ function Closing() {
           <span className={styles.sun} aria-hidden="true" />
           <svg className={styles.route} viewBox="0 0 600 260" aria-hidden="true">
             <path d="M8 240 C 120 40, 380 -10, 560 96" />
+            {/* O avião continua a linha, apontado para onde ela segue no fim. */}
+            <g className={styles.plane} transform="translate(579 107) rotate(75.5)">
+              <AirplaneTilt weight="fill" size={40} x={-20} y={-20} />
+            </g>
           </svg>
-          <AirplaneTilt weight="fill" className={styles.plane} aria-hidden="true" />
-          <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas caminhando de mãos dadas, uma delas puxando uma mala amarela" width={TRAVELERS_W} height={TRAVELERS_H} loading="lazy" />
+          <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas de mãos dadas, uma puxando uma mala amarela e a outra com câmera e bolsa" width={TRAVELERS_W} height={TRAVELERS_H} loading="lazy" />
         </div>
         <div className={styles.closingCopy} {...reveal(1)}>
           <p className={styles.kicker}>{BUSINESS.tagline}</p>
