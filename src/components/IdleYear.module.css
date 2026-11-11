@@ -1,0 +1,62 @@
+.idle { --cell: #d3d9fb; background: var(--mist); padding: clamp(64px, 10vw, 112px) 0; }
+@media (prefers-color-scheme: dark) { .idle { --cell: #1d2862; } }
+.grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); align-items: start; }
+.intro { display: grid; gap: 18px; }
+.intro h2 { max-width: 16ch; }
+.controls { margin-top: 10px; display: grid; gap: 22px; max-width: 420px; }
+
+.range { display: grid; gap: 8px; }
+.rangeHead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.rangeHead label { font-weight: 650; }
+.rangeHead output { font-weight: 850; font-stretch: 108%; font-size: 1.5rem; line-height: 1; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.range input { appearance: none; width: 100%; height: 28px; background: none; cursor: pointer; }
+.range input::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: linear-gradient(to right, var(--blue) var(--fill), var(--cell) var(--fill)); }
+.range input::-moz-range-track { height: 8px; border-radius: 999px; background: var(--cell); }
+.range input::-moz-range-progress { height: 8px; border-radius: 999px; background: var(--blue); }
+.range input::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; margin-top: -8px; border-radius: 50%; background: var(--yellow); border: 3px solid var(--navy); }
+.range input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--yellow); border: 3px solid var(--navy); }
+@media (prefers-color-scheme: dark) {
+  .range input::-webkit-slider-runnable-track { background: linear-gradient(to right, var(--yellow) var(--fill), var(--cell) var(--fill)); }
+  .range input::-moz-range-progress { background: var(--yellow); }
+  .range input::-webkit-slider-thumb { border-color: var(--yellow); background: var(--navy); }
+  .range input::-moz-range-thumb { border-color: var(--yellow); background: var(--navy); }
+}
+
+.chart { min-width: 0; }
+.months, .calendar { display: grid; grid-template-columns: repeat(53, minmax(0, 1fr)); gap: 3px; }
+.months { margin-bottom: 8px; font-size: 0.75rem; font-weight: 650; color: var(--ink-3); }
+.months span { white-space: nowrap; }
+.calendar { grid-template-rows: repeat(7, auto); grid-auto-flow: column; }
+.calendar i { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--cell); transition: background-color .3s var(--ease-out); }
+.calendar i.on { background: var(--orange); animation: pop .5s cubic-bezier(.34, 1.8, .64, 1) both; animation-delay: calc(var(--k, 0) * 16ms); }
+.calendar i.pad { visibility: hidden; }
+@keyframes pop { from { transform: scale(.2); } to { transform: none; } }
+
+.readout { margin-top: 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.readoutText { display: grid; gap: 4px; }
+.readoutText strong { font-size: 1.25rem; font-weight: 780; line-height: 1.2; }
+.readoutText span { color: var(--ink-2); }
+.luggo { margin-top: 16px; padding: 14px 18px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); color: var(--ink-2); }
+.luggo strong { color: var(--ink); }
+.legend { margin-top: 18px; display: flex; gap: 20px; font-size: 0.875rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; background: var(--cell); display: inline-block; }
+.swOn { background: var(--orange); }
+
+.flap { display: inline-flex; gap: 6px; perspective: 500px; }
+.digit {
+  position: relative; display: grid; place-items: center; width: 54px; height: 72px; border-radius: 10px;
+  background: var(--navy); color: var(--yellow); font-weight: 850; font-stretch: 108%; font-size: 3rem; line-height: 1;
+  font-variant-numeric: tabular-nums; box-shadow: 0 10px 20px -12px rgba(11, 18, 64, 0.6);
+  animation: flip .32s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 40ms); transform-origin: 50% 50%;
+}
+.digit::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(0, 0, 0, .45); }
+@keyframes flip { from { transform: rotateX(90deg); } to { transform: none; } }
+@media (prefers-color-scheme: dark) { .digit { background: #050a26; } }
+
+@media (max-width: 899px) {
+  .grid { grid-template-columns: 1fr; }
+  .calendar { grid-template-rows: none; grid-auto-flow: row; grid-template-columns: repeat(20, minmax(0, 1fr)); }
+  .calendar i.pad, .months { display: none; }
+  .digit { width: 44px; height: 60px; font-size: 2.5rem; }
+}

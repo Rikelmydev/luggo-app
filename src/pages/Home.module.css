@@ -123,25 +123,51 @@
 /* ---------- FAQ ---------- */
 .faq { padding: clamp(64px, 10vw, 112px) 0; }
 .faqGrid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 40px; }
-.faqHead { align-self: start; position: sticky; top: calc(var(--header-offset) + 24px); transition: top .3s var(--ease-out); }
-.allFaq { display: inline-block; margin-top: 18px; }
+.faqHead { align-self: start; display: grid; gap: 14px; justify-items: start; }
+.faqLede { color: var(--ink-2); max-width: 34ch; }
+.allFaq { font-size: 1rem; }
+.faqHelp {
+  margin-top: 18px; width: 100%; max-width: 380px; padding: 18px 20px; border-radius: var(--radius-lg); background: var(--mist);
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: center;
+}
+.faqHelpIcon { color: var(--accent-ink); grid-row: span 2; align-self: start; }
+.faqHelp p { color: var(--ink-2); font-size: 0.9375rem; }
+.faqHelpTitle { color: var(--ink) !important; font-weight: 780; font-size: 1.0625rem !important; }
+.faqHelp :global(.btn) { grid-column: 2; justify-self: start; margin-top: 6px; }
 .faqGroups { display: grid; gap: 32px; }
 .faqGroupTitle { font-weight: 800; font-size: 1.125rem; margin-bottom: 8px; }
-@media (max-width: 899px) { .faqGrid { grid-template-columns: 1fr; gap: 24px; } .faqHead { position: static; } }
+@media (max-width: 899px) { .faqGrid { grid-template-columns: 1fr; gap: 24px; } }
 
 /* ---------- Closing ---------- */
-.closing { position: relative; overflow: clip; background: var(--paper); padding-top: clamp(48px, 8vw, 96px); }
+.closing { position: relative; overflow: clip; background: var(--paper); padding-top: clamp(56px, 8vw, 104px); }
 .closing::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: var(--blue); }
-.closingGrid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: end; }
-.closingCopy { align-self: center; padding-bottom: 140px; }
-.manifesto { font-size: clamp(2.25rem, 1.2rem + 3.4vw, 4rem); color: var(--blue); max-width: 14ch; }
+.closingGrid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 72px); align-items: end; }
+
+/* A ilustração inteira, grande, alinhada ao começo do conteúdo, com os pés na faixa azul. */
+.closingArt { position: relative; justify-self: start; width: 100%; max-width: 600px; }
+.sun { position: absolute; left: 8%; top: 9%; width: 78%; aspect-ratio: 1; border-radius: 50%; background: var(--yellow); }
+.route { position: absolute; left: -2%; top: -4%; width: 104%; height: auto; overflow: visible; }
+.route path { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 2 12; }
+.plane { position: absolute; right: -1%; top: 11%; width: 38px; height: 38px; color: var(--blue); transform: rotate(28deg); }
+.travelers { position: relative; display: block; width: 100%; height: auto; }
+@media (prefers-color-scheme: dark) {
+  .route path { stroke: var(--on-blue-2); opacity: .7; }
+  .plane { color: var(--yellow); }
+}
+
+.closingCopy { align-self: center; padding-bottom: 150px; display: grid; justify-items: start; }
+.kicker { font-weight: 760; font-size: 0.9375rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent-ink); }
+.manifesto { margin-top: 12px; font-size: clamp(2.25rem, 1.2rem + 2.6vw, 3.5rem); color: var(--blue); max-width: 17ch; }
 @media (prefers-color-scheme: dark) { .manifesto { color: #fff; } }
+.closingLede { margin-top: 18px; max-width: 42ch; color: var(--ink-2); font-size: 1.0625rem; }
 .closingActions { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; }
-/* A ilustração fica inteira, alinhada ao começo do conteúdo, com os pés na faixa azul. */
-.travelers { justify-self: start; width: 100%; max-width: 440px; height: auto; }
+.closingFacts { margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 12px 24px; color: var(--ink-2); font-size: 0.9375rem; font-weight: 620; }
+.closingFacts li { display: inline-flex; align-items: center; gap: 8px; }
+.closingFacts svg { color: var(--accent-ink); }
+
 @media (max-width: 899px) {
   .closingGrid { grid-template-columns: 1fr; }
   .closingCopy { order: -1; padding-bottom: 8px; }
-  .travelers { max-width: 300px; }
+  .closingArt { max-width: 360px; }
   .closing::after { height: 80px; }
 }

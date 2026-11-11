@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router'
 import { MagnifyingGlass, SlidersHorizontal } from '../components/ui/icons'
 import { MODELS, type Kind, type Size } from '../data/catalog'
@@ -131,8 +131,8 @@ export function Catalog() {
         </p>
         {list.length ? (
           <ul className={styles.grid}>
-            {list.map(({ model, available }) => (
-              <li key={model.id}>
+            {list.map(({ model, available }, i) => (
+              <li key={model.id} data-reveal="" style={{ '--i': i % 4 } as CSSProperties}>
                 <ProductCard model={model} days={days} available={available} />
               </li>
             ))}

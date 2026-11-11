@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Link, useLocation, useNavigate, useNavigationType } from 'react-router'
 import { useReducedMotion } from 'motion/react'
 import {
+  AirplaneTilt,
   ArrowsClockwise,
   Broom,
   CalendarCheck,
+  ChatCircleText,
   CreditCard,
   LockKey,
   ShieldCheck,
@@ -20,13 +22,17 @@ import { moneyShort } from '../lib/format'
 import { useBag } from '../state/bag'
 import { usePageTitle } from '../state/hooks'
 import { CepCheck } from '../components/CepCheck'
+import { IdleYear } from '../components/IdleYear'
 import { DatesField } from '../components/DatesField'
 import { SuitcaseStage } from '../components/SuitcaseStage'
 import { Accordion } from '../components/ui/Accordion'
 import travelers from '../assets/img/viajantes.webp'
 import styles from './Home.module.css'
 
-const [TRAVELERS_W, TRAVELERS_H] = [900, 946]
+const [TRAVELERS_W, TRAVELERS_H] = [1200, 1264]
+
+/** Marca um bloco para entrar ao rolar; i atrasa um pouco cada item de uma lista. */
+const reveal = (i = 0) => ({ 'data-reveal': '', style: { '--i': i } as CSSProperties })
 
 const SIZE_FILTERS: { value: '' | Size | 'kit'; label: string }[] = [
   { value: '', label: 'Todas' },
@@ -61,6 +67,7 @@ export function Home() {
       <Delivery />
       <Included />
       <Faq />
+      <IdleYear />
       <Closing />
     </>
   )
@@ -121,10 +128,10 @@ function Steps() {
   return (
     <section className={styles.steps} aria-labelledby="como-funciona-titulo">
       <div className="container">
-        <h2 id="como-funciona-titulo" className="display h2">Como funciona</h2>
+        <h2 id="como-funciona-titulo" className="display h2" {...reveal()}>Como funciona</h2>
         <ol className={styles.stepList}>
           {steps.map((s, i) => (
-            <li key={s.title}>
+            <li key={s.title} {...reveal(i + 1)}>
               <span className={styles.stepNum}>{i + 1}</span>
               <s.icon size={30} className={styles.stepIcon} aria-hidden="true" />
               <h3 className={styles.stepTitle}>{s.title}</h3>
@@ -143,7 +150,7 @@ function Sizes() {
   return (
     <section id="malas" className={styles.sizesSec} aria-labelledby="tamanhos-titulo">
       <div className={`container ${styles.sizesGrid}`}>
-        <div className={styles.sizesCopy}>
+        <div className={styles.sizesCopy} {...reveal()}>
           <h2 id="tamanhos-titulo" className="display h2">Três tamanhos, lado a lado</h2>
           <p className="lede">Em escala real entre si: a de bordo vai na cabine, a média resolve uma semana e a grande aguenta intercâmbio e mudança.</p>
           <Link to="/malas?tamanho=kit" className={styles.kitLink}>
@@ -155,8 +162,8 @@ function Sizes() {
           <Link to="/malas" className={`link ${styles.allBags}`}>Ver todas as malas e preços</Link>
         </div>
         <ul className={styles.lineup}>
-          {(['P', 'M', 'G'] as Size[]).map((size) => (
-            <li key={size}>
+          {(['P', 'M', 'G'] as Size[]).map((size, i) => (
+            <li key={size} {...reveal(i + 1)}>
               <Link to={`/malas?tamanho=${size}`} className={styles.sizeCol}>
                 <span className={styles.figure}>
                   <img src={COLOR_INFO[sample[size]].image} alt="" width={760} height={997} loading="lazy" />
@@ -182,9 +189,9 @@ function Delivery() {
   return (
     <section className={styles.delivery} aria-labelledby="entrega-titulo">
       <div className="container">
-        <h2 id="entrega-titulo" className="display h2">Na sua porta e no caminho da viagem</h2>
+        <h2 id="entrega-titulo" className="display h2" {...reveal()}>Na sua porta e no caminho da viagem</h2>
         <div className={styles.deliveryGrid}>
-          <article className={styles.option}>
+          <article className={styles.option} {...reveal(1)}>
             <Truck size={34} className={styles.optIcon} aria-hidden="true" />
             <h3 className="h3">Entrega e coleta em casa</h3>
             <p className={styles.optPrice}>{moneyShort(pricing.deliveryFee)} por pedido, ida e volta</p>
@@ -195,7 +202,7 @@ function Delivery() {
             </ul>
             <CepCheck />
           </article>
-          <article className={`${styles.option} ${styles.optionStore}`}>
+          <article className={`${styles.option} ${styles.optionStore}`} {...reveal(2)}>
             <Storefront size={34} className={styles.optIcon} aria-hidden="true" />
             <h3 className="h3">Retirada na loja</h3>
             <p className={styles.optPrice}>Grátis</p>
@@ -227,10 +234,10 @@ function Included() {
   return (
     <section className={styles.included} aria-labelledby="inclui-titulo">
       <div className={`container ${styles.includedGrid}`}>
-        <h2 id="inclui-titulo" className="display h2">Toda mala Luggo vem assim</h2>
+        <h2 id="inclui-titulo" className="display h2" {...reveal()}>Toda mala Luggo vem assim</h2>
         <ul className={styles.includedList}>
-          {items.map((it) => (
-            <li key={it.title}>
+          {items.map((it, i) => (
+            <li key={it.title} {...reveal(i + 1)}>
               <it.icon size={28} aria-hidden="true" />
               <div>
                 <h3>{it.title}</h3>
@@ -249,14 +256,23 @@ function Faq() {
   return (
     <section id="perguntas" className={styles.faq} aria-labelledby="faq-titulo">
       <div className={`container ${styles.faqGrid}`}>
-        <div className={styles.faqHead}>
+        <div className={styles.faqHead} {...reveal()}>
           <h2 id="faq-titulo" className="display h2">Perguntas que todo mundo faz</h2>
+          <p className={styles.faqLede}>Reserva, entrega, pagamento e cuidados com a mala, em respostas curtas.</p>
           <button type="button" className={`link ${styles.allFaq}`} aria-expanded={all} onClick={() => setAll((v) => !v)}>
-            {all ? 'Ver menos perguntas' : 'Ver todas as perguntas'}
+            {all ? 'Ver menos perguntas' : `Ver todas as ${FAQ.reduce((n, g) => n + g.items.length, 0)} perguntas`}
           </button>
+          <div className={styles.faqHelp}>
+            <ChatCircleText size={28} className={styles.faqHelpIcon} aria-hidden="true" />
+            <div>
+              <p className={styles.faqHelpTitle}>Não achou a sua?</p>
+              <p>Respondemos em até 1 dia útil.</p>
+            </div>
+            <Link to="/contato" className="btn btn--blue btn--sm">Fale com a gente</Link>
+          </div>
         </div>
         {all ? (
-          <div className={styles.faqGroups}>
+          <div className={styles.faqGroups} {...reveal(1)}>
             {FAQ.map((g) => (
               <div key={g.title}>
                 <p className={styles.faqGroupTitle}>{g.title}</p>
@@ -265,7 +281,9 @@ function Faq() {
             ))}
           </div>
         ) : (
-          <Accordion items={FAQ_HIGHLIGHTS} />
+          <div {...reveal(1)}>
+            <Accordion items={FAQ_HIGHLIGHTS} />
+          </div>
         )}
       </div>
     </section>
@@ -274,16 +292,36 @@ function Faq() {
 
 function Closing() {
   const mostRented = getModel('media-rigida')!
+  const { operations } = BUSINESS
+  const facts = [
+    { icon: Broom, text: 'Higienizada a cada aluguel' },
+    { icon: XCircle, text: `Cancelamento grátis até ${operations.freeCancelHours}h antes` },
+    { icon: Truck, text: 'Entrega e coleta em toda a capital' },
+  ]
   return (
     <section className={styles.closing}>
       <div className={`container ${styles.closingGrid}`}>
-        <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas caminhando de mãos dadas, uma delas puxando uma mala amarela" width={TRAVELERS_W} height={TRAVELERS_H} loading="lazy" />
-        <div className={styles.closingCopy}>
+        <div className={styles.closingArt} {...reveal()}>
+          <span className={styles.sun} aria-hidden="true" />
+          <svg className={styles.route} viewBox="0 0 600 260" aria-hidden="true">
+            <path d="M8 240 C 120 40, 380 -10, 560 96" />
+          </svg>
+          <AirplaneTilt weight="fill" className={styles.plane} aria-hidden="true" />
+          <img className={styles.travelers} src={travelers} alt="Ilustração de duas pessoas caminhando de mãos dadas, uma delas puxando uma mala amarela" width={TRAVELERS_W} height={TRAVELERS_H} loading="lazy" />
+        </div>
+        <div className={styles.closingCopy} {...reveal(1)}>
+          <p className={styles.kicker}>{BUSINESS.tagline}</p>
           <p className={`display ${styles.manifesto}`}>A Luggo não vende malas. Vende a liberdade de viajar.</p>
+          <p className={styles.closingLede}>Você paga só os dias da viagem. No resto do ano, a mala fica com a gente, higienizada e pronta para a próxima.</p>
           <div className={styles.closingActions}>
             <Link to="/malas" className="btn btn--blue btn--lg">Escolher minha mala</Link>
             <Link to={`/malas/${mostRented.id}`} className="link">Ver a mais alugada</Link>
           </div>
+          <ul className={styles.closingFacts}>
+            {facts.map((f) => (
+              <li key={f.text}><f.icon size={20} aria-hidden="true" />{f.text}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

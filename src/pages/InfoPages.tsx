@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import {
   ArrowUUpLeft,
@@ -41,7 +41,7 @@ export function HowItWorks() {
       <div className={`container ${styles.section}`}>
         <ol className={styles.bigSteps}>
           {steps.map((s, i) => (
-            <li key={s.title}>
+            <li key={s.title} data-reveal="" style={{ '--i': i } as CSSProperties}>
               <span className={styles.bigNum}>{i + 1}</span>
               <div>
                 <h2 className={styles.stepTitle}><s.icon size={26} aria-hidden="true" />{s.title}</h2>
@@ -51,7 +51,7 @@ export function HowItWorks() {
           ))}
         </ol>
 
-        <section className={styles.policies} aria-labelledby="regras">
+        <section className={styles.policies} aria-labelledby="regras" data-reveal="">
           <h2 id="regras" className="display h2">As regras, sem letra miúda</h2>
           <dl className={styles.policyGrid}>
             <div><dt><ClockCountdown size={22} aria-hidden="true" />Desconto por período</dt><dd>10% a partir de 7 diárias e 20% a partir de 14.</dd></div>
