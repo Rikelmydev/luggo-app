@@ -1,5 +1,5 @@
 // Pedidos: criar, pagar, cancelar, estender e (na área da equipe) avançar o status.
-// Todas as funções são assíncronas, como seriam com um backend.
+// As regras rodam aqui; com Supabase, cada mudança é gravada (e conferida de novo) no banco.
 import { BUSINESS } from '../config/business'
 import { COLOR_INFO, getModel, type Color } from '../data/catalog'
 import { makeCode } from '../data/seed'
@@ -9,7 +9,9 @@ import { allocate, availableCount, canExtend, dailyAvailability, holdsUnits } fr
 import { createPixCharge } from './payments'
 import { extensionQuote, quote, rentalDays } from './pricing'
 import { reminderDue } from './reminders'
+import * as remote from './remote'
 import { delay, readDB, updateDB } from './storage'
+import { REMOTE } from './supabase'
 
 const { operations, pricing } = BUSINESS
 const nowISO = () => new Date().toISOString()
@@ -28,13 +30,28 @@ export interface NewOrder {
   fulfillment: Fulfillment
   protection: boolean
   method: PaymentMethod
+  account?: Order['account']
 }
 
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string }
 
 const ctx = () => {
   const db = readDB()
-  return { units: db.units, orders: db.orders, now: new Date() }
+  // Com Supabase, as reservas dos outros chegam só como ocupação (sem dados pessoais).
+  const known = new Set(db.orders.map((o) => o.code))
+  const holds = (db.holds ?? []).filter((h) => !known.has(h.code))
+  return { units: db.units, orders: [...db.orders, ...holds], now: new Date() }
+}
+
+/** A reserva é de quem está usando o site (e não um pedido de exemplo ou de outra pessoa)? */
+export const isMine = (order: Order) => (REMOTE ? remote.isMineCode(order.code) : order.source === 'site')
+
+const attempt = async (p: Promise<Order>): Promise<Result<Order>> => {
+  try {
+    return { ok: true, value: await p }
+  } catch (e) {
+    return { ok: false, error: remote.errorText(e) }
+  }
 }
 
 /* ---------- Consultas síncronas (rápidas, usadas pelo catálogo e calendário) ---------- */
@@ -72,7 +89,7 @@ export async function listOrders(): Promise<Order[]> {
 export async function listMyOrders(): Promise<Order[]> {
   await delay()
   return readDB()
-    .orders.filter((o) => o.source === 'site')
+    .orders.filter(isMine)
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 }
 
@@ -86,17 +103,22 @@ export function isActive(order: Order, now: Date = new Date()): boolean {
 /** Malas em reservas pagas e ainda abertas: somam com a reserva em montagem no botão Reservas. */
 export function reservedCount(orders: Order[], now: Date = new Date()): number {
   return orders
-    .filter((o) => o.source === 'site' && o.status !== 'aguardando_pagamento' && isActive(o, now))
+    .filter((o) => isMine(o) && o.status !== 'aguardando_pagamento' && isActive(o, now))
     .reduce((n, o) => n + o.items.reduce((sum, i) => sum + i.qty, 0), 0)
 }
 
 export async function getOrder(code: string): Promise<Order | undefined> {
   await delay()
-  return readDB().orders.find((o) => o.code === code.toUpperCase())
+  const find = () => readDB().orders.find((o) => o.code === code.toUpperCase())
+  if (find() || !REMOTE) return find()
+  // Pode ter sido feita na conta em outro aparelho: busca de novo no banco.
+  await remote.loadMine().catch(() => {})
+  return find()
 }
 
 export async function findOrder(code: string, email: string): Promise<Order | undefined> {
   await delay()
+  if (REMOTE) return remote.findOrder(code, email).catch(() => undefined)
   return readDB().orders.find((o) => o.code === code.trim().toUpperCase() && o.customer.email.toLowerCase() === email.trim().toLowerCase())
 }
 
@@ -110,7 +132,7 @@ export async function createOrder(input: NewOrder): Promise<Result<Order>> {
   }
 
   const c = ctx()
-  const items = []
+  const items: Order['items'] = []
   const taken: Order[] = []
   for (const item of input.items) {
     const model = getModel(item.modelId)
@@ -133,33 +155,49 @@ export async function createOrder(input: NewOrder): Promise<Result<Order>> {
     delivery: input.fulfillment.type === 'entrega',
   })
 
+  const build = (code: string): Order => {
+    const pix = input.method === 'pix' ? createPixCharge(code, price.total) : undefined
+    const createdAt = nowISO()
+    return {
+      code,
+      createdAt,
+      status: 'aguardando_pagamento',
+      customer: { ...input.customer, email: input.customer.email.trim().toLowerCase() },
+      start: input.start,
+      end: input.end,
+      items,
+      fulfillment: input.fulfillment,
+      protection: input.protection,
+      price,
+      payment: {
+        method: input.method,
+        status: 'pendente',
+        amount: price.total,
+        pixCode: pix?.code,
+        // O cartão também segura as malas por 30 minutos enquanto o cliente paga.
+        expiresAt: pix?.expiresAt ?? new Date(Date.now() + operations.pixMinutes * 60_000).toISOString(),
+      },
+      history: [{ status: 'aguardando_pagamento', at: createdAt }],
+      extensions: [],
+      source: 'site',
+      ...(input.account ? { account: input.account } : {}),
+    }
+  }
+
+  if (REMOTE) {
+    // O banco confere de novo se as malas estão livres; um código repetido só pede outro.
+    for (let tries = 0; ; tries++) {
+      try {
+        return { ok: true, value: await remote.placeOrder(build(makeCode())) }
+      } catch (e) {
+        if (remote.isCodeTaken(e) && tries < 3) continue
+        return { ok: false, error: remote.errorText(e) }
+      }
+    }
+  }
   let code = makeCode()
   while (readDB().orders.some((o) => o.code === code)) code = makeCode()
-  const pix = input.method === 'pix' ? createPixCharge(code, price.total) : undefined
-  const createdAt = nowISO()
-  const order: Order = {
-    code,
-    createdAt,
-    status: 'aguardando_pagamento',
-    customer: { ...input.customer, email: input.customer.email.trim().toLowerCase() },
-    start: input.start,
-    end: input.end,
-    items,
-    fulfillment: input.fulfillment,
-    protection: input.protection,
-    price,
-    payment: {
-      method: input.method,
-      status: 'pendente',
-      amount: price.total,
-      pixCode: pix?.code,
-      // O cartão também segura as malas por 30 minutos enquanto o cliente paga.
-      expiresAt: pix?.expiresAt ?? new Date(Date.now() + operations.pixMinutes * 60_000).toISOString(),
-    },
-    history: [{ status: 'aguardando_pagamento', at: createdAt }],
-    extensions: [],
-    source: 'site',
-  }
+  const order = build(code)
   updateDB((db) => ({ ...db, orders: [order, ...db.orders] }))
   return { ok: true, value: order }
 }
@@ -183,59 +221,55 @@ function placeholderOrder(input: NewOrder): Order {
   }
 }
 
-function patch(code: string, fn: (o: Order) => Order): Order {
-  let updated: Order | undefined
-  updateDB((db) => ({
-    ...db,
-    orders: db.orders.map((o) => {
-      if (o.code !== code) return o
-      updated = fn(o)
-      return updated
-    }),
-  }))
-  if (!updated) throw new Error('Pedido não encontrado')
-  return updated
+/** Grava o pedido já alterado: no navegador ou, com Supabase, no banco (que confere a mudança). */
+async function save(next: Order): Promise<Order> {
+  if (REMOTE) return remote.saveOrder(next)
+  updateDB((db) => ({ ...db, orders: db.orders.map((o) => (o.code === next.code ? next : o)) }))
+  return next
 }
+
+const cached = (code: string) => readDB().orders.find((o) => o.code === code)
 
 /** Resultado do pagamento (simulado nesta versão). */
 export async function settlePayment(code: string, approved: boolean): Promise<Result<Order>> {
   await delay(900)
-  const order = readDB().orders.find((o) => o.code === code)
+  const order = cached(code)
   if (!order) return { ok: false, error: 'Pedido não encontrado.' }
   if (order.status !== 'aguardando_pagamento') return { ok: true, value: order }
   if (!holdsUnits(order)) {
-    patch(code, (o) => ({ ...o, payment: { ...o.payment, status: 'expirado' } }))
+    await save({ ...order, payment: { ...order.payment, status: 'expirado' } }).catch(() => {})
     return { ok: false, error: 'O prazo para pagamento acabou e as malas foram liberadas. Faça a reserva de novo.' }
   }
   if (!approved) {
-    patch(code, (o) => ({ ...o, payment: { ...o.payment, status: 'recusado' } }))
+    await save({ ...order, payment: { ...order.payment, status: 'recusado' } }).catch(() => {})
     return { ok: false, error: 'Pagamento recusado pelo emissor do cartão. Tente outro cartão ou pague com Pix.' }
   }
   const at = nowISO()
-  const paid = patch(code, (o) => ({
-    ...o,
-    status: 'confirmado',
-    payment: { ...o.payment, status: 'aprovado', paidAt: at },
-    history: [...o.history, { status: 'confirmado', at }],
-  }))
-  return { ok: true, value: paid }
+  return attempt(
+    save({
+      ...order,
+      status: 'confirmado',
+      payment: { ...order.payment, status: 'aprovado', paidAt: at },
+      history: [...order.history, { status: 'confirmado', at }],
+    }),
+  )
 }
 
 /** Troca a forma de pagamento de um pedido que ainda não foi pago. */
 export async function switchPayment(code: string, method: PaymentMethod): Promise<Order> {
   await delay(400)
-  return patch(code, (o) => {
-    const pix = method === 'pix' ? createPixCharge(o.code, o.price.total) : undefined
-    return {
-      ...o,
-      payment: {
-        ...o.payment,
-        method,
-        status: 'pendente',
-        pixCode: pix?.code,
-        expiresAt: pix?.expiresAt ?? new Date(Date.now() + operations.pixMinutes * 60_000).toISOString(),
-      },
-    }
+  const o = cached(code)
+  if (!o) throw new Error('Pedido não encontrado')
+  const pix = method === 'pix' ? createPixCharge(o.code, o.price.total) : undefined
+  return save({
+    ...o,
+    payment: {
+      ...o.payment,
+      method,
+      status: 'pendente',
+      pixCode: pix?.code,
+      expiresAt: pix?.expiresAt ?? new Date(Date.now() + operations.pixMinutes * 60_000).toISOString(),
+    },
   })
 }
 
@@ -257,17 +291,18 @@ export function canCancel(order: Order): { ok: boolean; refund: boolean; reason?
 
 export async function cancelOrder(code: string): Promise<Result<Order>> {
   await delay(600)
-  const order = readDB().orders.find((o) => o.code === code)
+  const order = cached(code)
   if (!order) return { ok: false, error: 'Pedido não encontrado.' }
   const check = canCancel(order)
   if (!check.ok) return { ok: false, error: check.reason ?? 'Não é possível cancelar.' }
   const at = nowISO()
-  const done = patch(code, (o) => ({
-    ...o,
-    status: 'cancelado',
-    history: [...o.history, { status: 'cancelado', at, note: check.refund ? 'Cancelado pelo cliente, valor estornado' : 'Cancelado antes do pagamento' }],
-  }))
-  return { ok: true, value: done }
+  return attempt(
+    save({
+      ...order,
+      status: 'cancelado',
+      history: [...order.history, { status: 'cancelado', at, note: check.refund ? 'Cancelado pelo cliente, valor estornado' : 'Cancelado antes do pagamento' }],
+    }),
+  )
 }
 
 export function extensionPrice(order: Order, days: number): number {
@@ -285,30 +320,37 @@ export function checkExtension(order: Order, days: number): string | null {
 /** Estende o aluguel depois do pagamento (simulado) dos dias extras. */
 export async function extendOrder(code: string, days: number): Promise<Result<Order>> {
   await delay(900)
-  const order = readDB().orders.find((o) => o.code === code)
+  const order = cached(code)
   if (!order) return { ok: false, error: 'Pedido não encontrado.' }
   const error = checkExtension(order, days)
   if (error) return { ok: false, error }
   const amount = extensionPrice(order, days)
   const at = nowISO()
-  const updated = patch(code, (o) => ({
-    ...o,
-    end: addDays(o.end, days),
-    returnReminder: undefined,
-    extensions: [
-      ...o.extensions,
-      { days, amount, previousEnd: o.end, createdAt: at, payment: { method: 'pix', status: 'aprovado', amount, paidAt: at } },
-    ],
-  }))
-  return { ok: true, value: updated }
+  return attempt(
+    save({
+      ...order,
+      end: addDays(order.end, days),
+      returnReminder: undefined,
+      extensions: [
+        ...order.extensions,
+        { days, amount, previousEnd: order.end, createdAt: at, payment: { method: 'pix', status: 'aprovado', amount, paidAt: at } },
+      ],
+    }),
+  )
 }
 
 /** Dispara (simulado) os lembretes de devolução que venceram e devolve os pedidos avisados. */
-export function sendDueReminders(now: Date = new Date()): Order[] {
+export async function sendDueReminders(now: Date = new Date()): Promise<Order[]> {
   const at = now.toISOString()
-  return readDB()
-    .orders.filter((o) => reminderDue(o, now))
-    .map((o) => patch(o.code, (cur) => ({ ...cur, returnReminder: { sentAt: at, to: cur.customer.email } })))
+  const sent: Order[] = []
+  for (const o of readDB().orders.filter((o) => isMine(o) && reminderDue(o, now))) {
+    try {
+      sent.push(await save({ ...o, returnReminder: { sentAt: at, to: o.customer.email } }))
+    } catch {
+      /* sem conexão: tenta de novo no próximo minuto */
+    }
+  }
+  return sent
 }
 
 /* ---------- Área da equipe ---------- */
@@ -321,11 +363,11 @@ export const NEXT_STATUS: Partial<Record<OrderStatus, { to: OrderStatus; action:
 
 export async function advanceOrder(code: string): Promise<Order> {
   await delay(300)
-  return patch(code, (o) => {
-    const next = NEXT_STATUS[o.status]
-    if (!next) return o
-    return { ...o, status: next.to, history: [...o.history, { status: next.to, at: nowISO() }] }
-  })
+  const o = cached(code)
+  if (!o) throw new Error('Pedido não encontrado')
+  const next = NEXT_STATUS[o.status]
+  if (!next) return o
+  return save({ ...o, status: next.to, history: [...o.history, { status: next.to, at: nowISO() }] })
 }
 
 export async function listUnits(): Promise<Unit[]> {
@@ -335,6 +377,7 @@ export async function listUnits(): Promise<Unit[]> {
 
 export async function setMaintenance(unitId: string, maintenance: boolean, note?: string): Promise<void> {
   await delay(300)
+  if (REMOTE) return remote.setMaintenance(unitId, maintenance, note)
   updateDB((db) => ({
     ...db,
     units: db.units.map((u) => (u.id === unitId ? { ...u, maintenance, note: maintenance ? note : undefined } : u)),
@@ -344,7 +387,8 @@ export async function setMaintenance(unitId: string, maintenance: boolean, note?
 export async function sendContact(msg: Omit<ContactMessage, 'id' | 'createdAt'>): Promise<ContactMessage> {
   await delay(700)
   const saved = { ...msg, id: makeCode().replace('LG', 'MSG-'), createdAt: nowISO() }
-  updateDB((db) => ({ ...db, messages: [saved, ...db.messages] }))
+  if (REMOTE) await remote.sendMessage(saved)
+  else updateDB((db) => ({ ...db, messages: [saved, ...db.messages] }))
   return saved
 }
 

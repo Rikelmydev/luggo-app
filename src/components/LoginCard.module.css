@@ -2,3 +2,7 @@
 .providers, .form { display: grid; gap: 10px; }
 .form { gap: 14px; }
 .other { justify-self: center; font-size: 0.9375rem; }
+.switch { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; background: var(--paper-2); border: 1px solid var(--line); }
+.switch button { min-height: 40px; border-radius: 999px; font-weight: 700; color: var(--ink-2); }
+.switch button[aria-selected='true'] { background: var(--card); color: var(--ink); box-shadow: var(--shadow-1); }
+.note { color: var(--ink-2); font-size: 0.875rem; }

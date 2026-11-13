@@ -12,6 +12,7 @@
     "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.0",
     "motion": "^12.43.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.3.1",

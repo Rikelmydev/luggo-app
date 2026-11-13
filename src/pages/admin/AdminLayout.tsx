@@ -1,9 +1,14 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 import { ArrowCounterClockwise, ChartBar, ListChecks, Package, SignOut, Storefront, SunHorizon } from '../../components/ui/icons'
 import { BUSINESS } from '../../config/business'
-import { resetDemoData } from '../../services/storage'
+import { buildSeed } from '../../data/seed'
+import { enterStaff, leaveStaff, resetDemo } from '../../services/remote'
+import { readDB, resetDemoData } from '../../services/storage'
+import { REMOTE } from '../../services/supabase'
+import { useAuth } from '../../state/auth'
 import { usePageTitle } from '../../state/hooks'
+import { AccountLogin } from '../../components/LoginCard'
 import { BrandMark } from '../../components/layout/Brand'
 import { Notice } from '../../components/ui/Bits'
 import { useToast } from '../../components/ui/Toast'
@@ -19,9 +24,101 @@ const readSession = () => {
 }
 
 export function AdminLayout() {
+  return REMOTE ? <StaffAccess /> : <DemoAccess />
+}
+
+/** Sem Supabase: PIN de demonstração, como antes. */
+function DemoAccess() {
   const [ok, setOk] = useState(readSession)
-  const notify = useToast()
   if (!ok) return <AdminGate onEnter={() => setOk(true)} />
+  return (
+    <AdminShell
+      onReset={async () => {
+        resetDemoData(true)
+      }}
+      onSignOut={() => {
+        try {
+          sessionStorage.removeItem(KEY)
+        } catch {
+          /* ignora */
+        }
+        setOk(false)
+      }}
+    />
+  )
+}
+
+/** Com Supabase: conta da equipe. O banco confere o e-mail na tabela staff antes de liberar os pedidos. */
+function StaffAccess() {
+  usePageTitle('Área da equipe')
+  const { session, ready, signOut } = useAuth()
+  const [state, setState] = useState<'checking' | 'staff' | 'denied' | 'error'>('checking')
+  const email = session?.email
+
+  useEffect(() => {
+    if (!email) return
+    let alive = true
+    setState('checking')
+    enterStaff()
+      .then(async (ok) => {
+        // Primeiro acesso: o estoque ainda está vazio, então cria as malas e os pedidos de exemplo.
+        if (ok && readDB().units.length === 0) {
+          const seed = buildSeed(new Date())
+          await resetDemo(seed.units, seed.orders)
+        }
+        if (alive) setState(ok ? 'staff' : 'denied')
+      })
+      .catch(() => alive && setState('error'))
+    return () => {
+      alive = false
+    }
+  }, [email])
+
+  const exit = () => {
+    leaveStaff().catch(() => {})
+    signOut()
+  }
+
+  if (!ready) return <div className={styles.gate} aria-busy="true" />
+  if (!session) {
+    return (
+      <div className={styles.gate}>
+        <div className={styles.gateStack}>
+          <BrandMark className={styles.gateBrand} />
+          <AccountLogin title="Área da equipe" path="equipe" />
+          <Link to="/" className="link">Voltar para o site</Link>
+        </div>
+      </div>
+    )
+  }
+  if (state !== 'staff') {
+    return (
+      <div className={styles.gate}>
+        <div className={styles.gateCard}>
+          <BrandMark className={styles.gateBrand} />
+          <h1 className={styles.gateTitle}>Área da equipe</h1>
+          {state === 'checking' && <p className={styles.muted} aria-live="polite">Conferindo o acesso de {session.email}...</p>}
+          {state === 'denied' && <Notice tone="bad">O e-mail {session.email} não faz parte da equipe.</Notice>}
+          {state === 'error' && <Notice tone="bad">Não conseguimos falar com o servidor. Confira a internet e recarregue a página.</Notice>}
+          {state !== 'checking' && <button type="button" className="btn btn--ghost btn--block" onClick={exit}>Entrar com outra conta</button>}
+          <Link to="/" className="link">Voltar para o site</Link>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <AdminShell
+      onReset={async () => {
+        const seed = buildSeed(new Date())
+        await resetDemo(seed.units, seed.orders)
+      }}
+      onSignOut={exit}
+    />
+  )
+}
+
+function AdminShell({ onReset, onSignOut }: { onReset: () => Promise<void>; onSignOut: () => void }) {
+  const notify = useToast()
 
   const links = [
     { to: '/equipe', label: 'Hoje', icon: SunHorizon, end: true },
@@ -50,8 +147,9 @@ export function AdminLayout() {
             type="button"
             className={styles.sideLink}
             onClick={() => {
-              resetDemoData(true)
-              notify('Dados de demonstração restaurados.')
+              onReset()
+                .then(() => notify('Pedidos de exemplo e estoque restaurados. As reservas do site foram mantidas.'))
+                .catch(() => notify('Não deu para restaurar agora. Tente de novo.'))
             }}
           >
             <ArrowCounterClockwise size={18} aria-hidden="true" />Restaurar demonstração
@@ -59,14 +157,7 @@ export function AdminLayout() {
           <button
             type="button"
             className={styles.sideLink}
-            onClick={() => {
-              try {
-                sessionStorage.removeItem(KEY)
-              } catch {
-                /* ignora */
-              }
-              setOk(false)
-            }}
+            onClick={onSignOut}
           >
             <SignOut size={18} aria-hidden="true" />Sair
           </button>

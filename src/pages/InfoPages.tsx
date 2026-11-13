@@ -145,9 +145,13 @@ export function Contact() {
     setErrors(errs)
     if (Object.keys(errs).length) return
     setBusy(true)
-    const msg = await sendContact(form)
+    try {
+      const msg = await sendContact(form)
+      setSent(msg.id)
+    } catch {
+      setErrors({ message: 'Não conseguimos enviar agora. Confira a internet e tente de novo.' })
+    }
     setBusy(false)
-    setSent(msg.id)
   }
 
   return (

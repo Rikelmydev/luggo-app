@@ -11,6 +11,7 @@ import { createOrder, earliestStart, validatePeriod } from '../services/orders'
 import { quote, rentalDays } from '../services/pricing'
 import { CUSTOMER_KEY, kv } from '../services/storage'
 import { useBag } from '../state/bag'
+import { useAuth } from '../state/auth'
 import { usePageTitle } from '../state/hooks'
 import { PaymentModal } from '../components/PaymentModal'
 import { PriceSummary } from '../components/PriceSummary'
@@ -34,9 +35,10 @@ export function Checkout() {
   const bag = useBag()
   const navigate = useNavigate()
   const saved = useMemo(loadSaved, [])
+  const { session } = useAuth()
 
   const [step, setStep] = useState(0)
-  const [customer, setCustomer] = useState({ name: saved?.name ?? '', email: saved?.email ?? '', phone: saved?.phone ?? '' })
+  const [customer, setCustomer] = useState({ name: saved?.name ?? session?.name ?? '', email: saved?.email ?? session?.email ?? '', phone: saved?.phone ?? '' })
   const [custErr, setCustErr] = useState<Partial<Record<keyof typeof customer, string>>>({})
 
   const [mode, setMode] = useState<'loja' | 'entrega'>('loja')
@@ -140,6 +142,7 @@ export function Checkout() {
         : { type: 'loja' },
       protection: bag.protection,
       method,
+      account: session ? { email: session.email, provider: session.provider } : undefined,
     })
     setSubmitting(false)
     if (!res.ok) {

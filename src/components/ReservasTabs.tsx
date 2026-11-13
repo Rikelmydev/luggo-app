@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router'
-import { isActive } from '../services/orders'
+import { isActive, isMine } from '../services/orders'
 import { useBag } from '../state/bag'
 import { useDB } from '../state/hooks'
 import styles from './ReservasTabs.module.css'
@@ -8,7 +8,7 @@ import styles from './ReservasTabs.module.css'
 export function ReservasTabs() {
   const { count } = useBag()
   const { orders } = useDB()
-  const made = orders.filter((o) => o.source === 'site' && isActive(o)).length
+  const made = orders.filter((o) => isMine(o) && isActive(o)).length
   return (
     <div className="container">
       <nav className={styles.tabs} aria-label="Reservas">

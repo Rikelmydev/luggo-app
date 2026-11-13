@@ -136,7 +136,8 @@ export function buildSeed(now: Date): { units: Unit[]; orders: Order[] } {
       delivery,
     })
 
-    const createdDay = addDays(draft.start, -between(2, 18))
+    // Nenhum pedido de exemplo pode ter sido feito depois de hoje.
+    const createdDay = [addDays(draft.start, -between(2, 18)), addDays(today, -1)].sort()[0]
     const createdAt = at(createdDay, between(8, 22), between(0, 59))
     const paidAt = at(createdDay, Math.min(23, Number(createdAt.slice(11, 13)) + 1), between(0, 59))
     const cleanEnd = addDays(draft.end, BUSINESS.operations.cleaningDays)

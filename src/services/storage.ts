@@ -1,14 +1,18 @@
-// Banco de dados local: tudo o que um backend guardaria, aqui fica no navegador.
-// Para ligar um backend de verdade, troque as funções dos serviços que usam readDB/writeDB.
+// Dados que as telas leem na hora. Sem Supabase, é o banco inteiro guardado no navegador;
+// com Supabase, é uma cópia do que esta pessoa pode ver, mantida em dia por services/remote.ts.
 import type { ContactMessage, Order, Unit } from '../domain/types'
 import { buildSeed } from '../data/seed'
+import { REMOTE } from './supabase'
 
 export interface DB {
   version: 1
   seededAt: string
   units: Unit[]
+  /** Pedidos completos que esta pessoa pode ver: os dela, ou todos para a equipe. */
   orders: Order[]
   messages: ContactMessage[]
+  /** Ocupação das outras reservas, sem dados pessoais (só com Supabase). */
+  holds?: Order[]
 }
 
 const DB_KEY = 'luggo:db:v1'
@@ -52,6 +56,10 @@ function seedDB(): DB {
 
 export function readDB(): DB {
   if (cache) return cache
+  if (REMOTE) {
+    cache = { version: 1, seededAt: new Date().toISOString(), units: [], orders: [], messages: [], holds: [] }
+    return cache
+  }
   const raw = kv.get(DB_KEY)
   if (raw) {
     try {
@@ -71,7 +79,7 @@ export function readDB(): DB {
 
 export function writeDB(next: DB) {
   cache = next
-  kv.set(DB_KEY, JSON.stringify(next))
+  if (!REMOTE) kv.set(DB_KEY, JSON.stringify(next))
   listeners.forEach((fn) => fn())
 }
 
@@ -98,14 +106,14 @@ export function subscribe(fn: () => void): () => void {
 // Outra aba mudou os dados: recarrega.
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
-    if (e.key === DB_KEY) {
+    if (e.key === DB_KEY && !REMOTE) {
       cache = null
       listeners.forEach((fn) => fn())
     }
   })
 }
 
-/** Latência simulada, para a interface mostrar estados de carregamento reais. */
-export const network = { latency: 350 }
+/** Latência simulada sem Supabase, para a interface mostrar estados de carregamento reais. */
+export const network = { latency: REMOTE ? 0 : 350 }
 export const delay = (ms?: number) =>
   network.latency === 0 ? Promise.resolve() : new Promise<void>((r) => setTimeout(r, ms ?? network.latency))

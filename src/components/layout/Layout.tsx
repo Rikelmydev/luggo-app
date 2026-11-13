@@ -61,9 +61,9 @@ function ReturnReminders() {
   const notify = useToast()
   const now = useNow(60_000)
   useEffect(() => {
-    for (const order of sendDueReminders(new Date(now))) {
-      notify(`E-mail enviado para ${order.customer.email}: faltam menos de 24h para devolver a reserva ${order.code}.`)
-    }
+    sendDueReminders(new Date(now)).then((sent) => {
+      for (const order of sent) notify(`E-mail enviado para ${order.customer.email}: faltam menos de 24h para devolver a reserva ${order.code}.`)
+    })
   }, [now, notify])
   return null
 }

@@ -88,11 +88,11 @@ describe('lembrete de devolução', () => {
   it('sai 24h antes do prazo, uma vez só, para o e-mail da reserva', async () => {
     const o = await paidOrder()
     const when = reminderTime(o)
-    expect(sendDueReminders(at(when, -1))).toHaveLength(0)
-    const sent = sendDueReminders(at(when, 1))
+    expect(await sendDueReminders(at(when, -1))).toHaveLength(0)
+    const sent = await sendDueReminders(at(when, 1))
     expect(sent.map((s) => s.code)).toEqual([o.code])
     expect(sent[0].returnReminder?.to).toBe('marina@example.com')
-    expect(sendDueReminders(at(when, 2))).toHaveLength(0)
+    expect(await sendDueReminders(at(when, 2))).toHaveLength(0)
   })
 
   it('não sai depois do prazo, nem para pedidos de demonstração', async () => {
@@ -103,7 +103,7 @@ describe('lembrete de devolução', () => {
 
   it('estender o aluguel arma o lembrete de novo', async () => {
     const o = await paidOrder()
-    sendDueReminders(at(reminderTime(o), 1))
+    await sendDueReminders(at(reminderTime(o), 1))
     const extended = await extendOrder(o.code, 2)
     expect(extended.ok && extended.value.returnReminder).toBeUndefined()
   })

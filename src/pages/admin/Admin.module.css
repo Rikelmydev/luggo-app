@@ -64,6 +64,7 @@
 .rowLink:hover td { background: var(--paper-2); }
 .codeBtn { font-weight: 850; font-stretch: 86%; letter-spacing: 0.03em; color: var(--accent-ink); }
 .codeBtn:hover { text-decoration: underline; }
+.days { display: block; color: var(--ink-3); font-size: 0.8125rem; }
 .siteTag { margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: var(--yellow); color: var(--navy); font-size: 0.6875rem; font-weight: 800; }
 .detail { display: grid; gap: 14px; }
 .detailGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
@@ -92,6 +93,9 @@
 
 /* Acesso */
 .gate { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--blue); }
+.gateStack { display: grid; gap: 16px; justify-items: center; width: 100%; max-width: 440px; }
+.gateStack > section { width: 100%; max-width: none; }
+.gateStack > a, .gateStack .gateBrand { color: #fff; }
 .gateCard { width: min(400px, 100%); display: grid; gap: 12px; justify-items: start; padding: 32px 28px; border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow-2); }
 .gateCard :global(.btn) { margin-top: 6px; }
 .gateBrand { color: var(--accent-ink); }

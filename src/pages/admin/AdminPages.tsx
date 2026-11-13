@@ -17,6 +17,7 @@ import { useToast } from '../../components/ui/Toast'
 import styles from './Admin.module.css'
 
 const UNIT_COST = 220
+const ACCOUNT_LABEL = { google: 'Entrou com Google', apple: 'Entrou com Apple', email: 'Entrou com e-mail' } as const
 
 const itemsText = (o: Order) =>
   o.items.map((i) => `${i.qty > 1 ? `${i.qty} × ` : ''}${getModel(i.modelId)?.name}${i.color ? ` ${COLOR_INFO[i.color].label}` : ''}`).join(', ')
@@ -155,7 +156,8 @@ export function AdminOrders() {
     return [...db.orders]
       .filter((o) => !status || o.status === status)
       .filter((o) => !term || o.code.toLowerCase().includes(term) || o.customer.name.toLowerCase().includes(term) || o.customer.email.includes(term))
-      .sort((a, b) => (a.start < b.start ? 1 : -1))
+      // Reservas do site primeiro, as mais novas no topo; depois os pedidos de exemplo.
+      .sort((a, b) => Number(b.source === 'site') - Number(a.source === 'site') || (a.createdAt < b.createdAt ? 1 : -1))
   }, [db.orders, status, q])
   const selected = open ? db.orders.find((o) => o.code === open) : undefined
 
@@ -199,7 +201,10 @@ export function AdminOrders() {
                     {o.source === 'site' && <span className={styles.siteTag}>site</span>}
                   </td>
                   <td>{o.customer.name}</td>
-                  <td className={styles.nowrap}>{formatWeekday(o.start)} até {formatWeekday(o.end)}</td>
+                  <td className={styles.nowrap}>
+                    {formatWeekday(o.start)} até {formatWeekday(o.end)}
+                    <span className={styles.days}>{plural(diffDays(o.start, o.end), 'diária', 'diárias')}</span>
+                  </td>
                   <td className={styles.ellipsis}>{itemsText(o)}</td>
                   <td>{o.fulfillment.type === 'entrega' ? `Entrega, ${o.fulfillment.address.district}` : 'Loja'}</td>
                   <td className={`${styles.right} num`}>{money(o.price.total)}</td>
@@ -277,6 +282,7 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
         <dl className={styles.detailGrid}>
           <div><dt>Cliente</dt><dd>{order.customer.name}</dd></div>
           <div><dt>Contato</dt><dd>{order.customer.email}<br />{hidePhone(order.customer.phone)}</dd></div>
+          {order.account && <div><dt>Conta</dt><dd>{order.account.email}<br />{ACCOUNT_LABEL[order.account.provider]}</dd></div>}
           <div><dt>Período</dt><dd>{formatWeekday(order.start)} até {formatWeekday(order.end)} ({plural(diffDays(order.start, order.end), 'diária', 'diárias')})</dd></div>
           <div><dt>Recebimento</dt><dd>{f.type === 'entrega' ? <>{f.address.street}, {f.address.number}{f.address.complement ? `, ${f.address.complement}` : ''}<br />{f.address.district}, {win?.label} ({win?.time})</> : 'Retirada na loja'}</dd></div>
           <div><dt>Malas físicas</dt><dd className={styles.units}>{order.items.flatMap((i) => i.unitIds).map((id) => <span key={id}>{id}</span>)}</dd></div>

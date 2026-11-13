@@ -109,6 +109,8 @@ export interface Order {
   payment: Payment
   history: StatusEvent[]
   extensions: Extension[]
+  /** Conta com que o cliente estava conectado ao reservar. */
+  account?: { email: string; provider: 'google' | 'apple' | 'email' }
   /** Lembrete de devolução já enviado (simulado). Volta a valer se o aluguel for estendido. */
   returnReminder?: { sentAt: string; to: string }
   /** 'site' = feita neste navegador; 'demo' = pedido fictício de demonstração. */
