@@ -32,7 +32,8 @@ export function LoginCard() {
 export function AccountLogin({ title, path, signUp: canSignUp = false }: { title: string; path: string; signUp?: boolean }) {
   const auth = useAuth()
   const [mode, setMode] = useState<'entrar' | 'criar'>('entrar')
-  const [form, setForm] = useState(() => ({ ...lastCustomer(), password: '' }))
+  // Começa vazio: numa conta de verdade, nada de sugerir o e-mail de quem usou este aparelho antes.
+  const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string }>({})
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
