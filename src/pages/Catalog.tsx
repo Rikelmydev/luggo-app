@@ -5,7 +5,7 @@ import { MODELS, type Kind, type Size } from '../data/catalog'
 import { useBag } from '../state/bag'
 import { useDataVersion, usePageTitle } from '../state/hooks'
 import { stockAvailable, validatePeriod } from '../services/orders'
-import { rentalDays } from '../services/pricing'
+import { periodPrice, rentalDays } from '../services/pricing'
 import { DatesField } from '../components/DatesField'
 import { ProductCard } from '../components/ProductCard'
 import { EmptyState, Notice } from '../components/ui/Bits'
@@ -18,6 +18,8 @@ const SIZES: { value: '' | Size | 'kit'; label: string }[] = [
   { value: 'G', label: 'Grande' },
   { value: 'kit', label: 'Kits' },
 ]
+const week = (id: string) => periodPrice(id, 1, 7)
+
 const KINDS: { value: '' | Exclude<Kind, 'kit'>; label: string }[] = [
   { value: '', label: 'Qualquer tipo' },
   { value: 'rigida', label: 'Rígida' },
@@ -60,8 +62,8 @@ export function Catalog() {
       .filter((x) => !onlyAvailable || x.available === undefined || x.available > 0)
       .sort((a, b) =>
         sort === 'preco'
-          ? a.model.daily - b.model.daily
-          : (a.model.kind === 'kit' ? 1 : 0) - (b.model.kind === 'kit' ? 1 : 0) || sizeOrder[a.model.size] - sizeOrder[b.model.size] || a.model.daily - b.model.daily,
+          ? week(a.model.id) - week(b.model.id)
+          : (a.model.kind === 'kit' ? 1 : 0) - (b.model.kind === 'kit' ? 1 : 0) || sizeOrder[a.model.size] - sizeOrder[b.model.size] || week(a.model.id) - week(b.model.id),
       )
     // version: o estoque mudou (pedido novo, mala em manutenção)
     // eslint-disable-next-line react-hooks/exhaustive-deps

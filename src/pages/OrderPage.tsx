@@ -231,7 +231,7 @@ function ExtendModal({ order, open, onClose }: { order: Order; open: boolean; on
       onClose={onClose}
       locked={busy}
       title="Ficar mais dias"
-      description="Os dias extras saem pela diária cheia, sem desconto. Pago na hora com Pix (simulado)."
+      description="Você paga só a diferença na tabela entre o período novo e o que já pagou. Pago na hora com Pix (simulado)."
       size="sm"
       footer={
         <>

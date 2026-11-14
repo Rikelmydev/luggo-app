@@ -16,32 +16,38 @@ export const BUSINESS = {
   },
 
   pricing: {
-    minDays: 3,
-    /** Desconto progressivo pelo número de diárias (o maior que couber vale). */
-    discounts: [
-      { fromDays: 14, pct: 0.2 },
-      { fromDays: 7, pct: 0.1 },
-    ],
+    minDays: 1,
+    /**
+     * Preço de UMA mala pelo período inteiro, por peso que ela leva (tabela de 2026):
+     * de bordo até 10 kg, média até 23 kg, grande até 32 kg. Entre os dias marcados, o preço
+     * sobe em linha reta; quanto mais dias, menor o preço por dia.
+     */
+    table: {
+      P: [[1, 24.9], [7, 69.9], [15, 99.9], [30, 129.9]],
+      M: [[1, 34.9], [7, 89.9], [15, 139.9], [30, 179.9]],
+      G: [[1, 39.9], [7, 109.9], [15, 169.9], [30, 219.9]],
+    },
     /** Proteção contra danos: por mala, por dia. */
     protectionPerDay: 3,
     /** Entrega e coleta na capital, por pedido. */
     deliveryFee: 24.9,
-    /** Dia extra (atraso ou extensão) = diária cheia x este fator. */
+    /** Atraso sem aviso: o preço de 1 dia x este fator, por dia. */
     extraDayFactor: 1.2,
   },
 
   operations: {
     /** Dias que a mala passa em higienização depois de voltar. */
     cleaningDays: 1,
-    /** Antecedência mínima para entrega em casa. */
-    deliveryLeadDays: 1,
+    /** Antecedência mínima para entrega em casa (0 = no mesmo dia). */
+    deliveryLeadDays: 0,
     /** Até quantas horas antes da retirada o cancelamento é grátis. */
     freeCancelHours: 48,
     /** Quanto tempo o Pix fica válido. */
     pixMinutes: 30,
     /** Até quantos dias à frente dá para reservar. */
     maxAdvanceDays: 180,
-    maxDays: 60,
+    /** A tabela de preços vai até 30 dias. */
+    maxDays: 30,
     deliveryWindows: [
       { id: 'manha', label: 'Manhã', time: '8h às 12h', endHour: 12 },
       { id: 'tarde', label: 'Tarde', time: '12h às 16h', endHour: 16 },

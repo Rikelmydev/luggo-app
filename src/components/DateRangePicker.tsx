@@ -91,7 +91,7 @@ export function DateRangePicker({
         const n = diffDays(start, d)
         setHint(
           n < minDays
-            ? `O aluguel mínimo é de ${minDays} diárias.`
+            ? `O aluguel mínimo é de ${plural(minDays, 'diária', 'diárias')}.`
             : n > maxDays
               ? `O máximo é de ${maxDays} diárias.`
               : 'Não há mala livre no período inteiro. Escolha uma devolução mais cedo.',
@@ -153,7 +153,7 @@ export function DateRangePicker({
       ? start && end
         ? `${formatWeekday(start)} até ${formatWeekday(end)}, ${plural(days, 'diária', 'diárias')}`
         : 'Escolha o dia da retirada'
-      : `Agora escolha a devolução (mínimo de ${minDays} diárias)`)
+      : `Agora escolha a devolução (mínimo de ${plural(minDays, 'diária', 'diárias')})`)
 
   return (
     <div className={styles.picker}>

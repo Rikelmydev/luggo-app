@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router'
 import { CheckCircle, ShieldCheck, Sparkle, Suitcase } from '../components/ui/icons'
 import { BUSINESS } from '../config/business'
-import { COLOR_INFO, MODELS, SIZE_INFO, getModel, kitListDaily, modelImage, type Color, type Model } from '../data/catalog'
-import { moneyShort, plural } from '../lib/format'
+import { COLOR_INFO, MODELS, SIZE_INFO, getModel, modelImage, type Color, type Model } from '../data/catalog'
+import { money, plural } from '../lib/format'
 import { useBag } from '../state/bag'
 import { useDataVersion, usePageTitle } from '../state/hooks'
 import { stockAvailable, stockByDay, validatePeriod } from '../services/orders'
-import { quote, rentalDays } from '../services/pricing'
+import { kitListPrice, periodPrice, quote, rentalDays } from '../services/pricing'
 import { DatesField } from '../components/DatesField'
 import { PriceSummary } from '../components/PriceSummary'
 import { ProductCard } from '../components/ProductCard'
@@ -119,7 +119,7 @@ function ProductView({ model }: { model: Model }) {
                   )
                 })}
               </ul>
-              <p className={styles.muted}>Avulsas, essas malas custariam {moneyShort(kitListDaily(model))} por dia.</p>
+              <p className={styles.muted}>Avulsas, essas malas custariam {money(kitListPrice(model, 7))} por 7 dias. No kit, saem por {money(periodPrice(model.id, 1, 7))}.</p>
             </section>
           )}
 
@@ -142,9 +142,18 @@ function ProductView({ model }: { model: Model }) {
             <h1 id="produto-titulo" className={`display ${styles.title}`}>{model.name}</h1>
             <p className={styles.summary}>{model.summary}</p>
             <p className={styles.daily}>
-              <strong className="num">{moneyShort(model.daily)}</strong> por dia
-              <span className={styles.dailyNote}>10% off a partir de 7 diárias, 20% a partir de 14</span>
+              <span><strong className="num">{money(periodPrice(model.id, 1, 7))}</strong> por 7 dias</span>
+              <span className={styles.dailyNote}>Quanto mais dias, menor o preço por dia.</span>
             </p>
+            {/* A tabela do período: o preço do aluguel inteiro, não por dia. */}
+            <dl className={styles.priceTable}>
+              {[1, 7, 15, 30].map((d) => (
+                <div key={d}>
+                  <dt>{plural(d, 'dia', 'dias')}</dt>
+                  <dd className="num">{money(periodPrice(model.id, 1, d))}</dd>
+                </div>
+              ))}
+            </dl>
 
             {!isKit && (
               <fieldset className={styles.colors}>

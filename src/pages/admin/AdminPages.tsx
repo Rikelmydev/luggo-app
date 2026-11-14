@@ -327,7 +327,7 @@ export function AdminStock() {
         const units = db.units.filter((u) => u.modelId === m.id)
         return (
           <section key={m.id} className={styles.stockGroup} aria-labelledby={`g-${m.id}`}>
-            <h2 id={`g-${m.id}`} className={styles.h2}>{m.name} <span className={styles.muted}>{units.length} malas, {moneyShort(m.daily)} por dia</span></h2>
+            <h2 id={`g-${m.id}`} className={styles.h2}>{m.name} <span className={styles.muted}>{units.length} malas, {money(periodPrice(m.id, 1, 7))} por 7 dias</span></h2>
             <ul className={styles.unitGrid}>
               {units.map((u) => {
                 const st = states.get(u.id)!

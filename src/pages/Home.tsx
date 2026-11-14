@@ -18,7 +18,8 @@ import {
 import { BUSINESS } from '../config/business'
 import { COLOR_INFO, MODELS, SIZE_INFO, getModel, type Size } from '../data/catalog'
 import { FAQ, FAQ_HIGHLIGHTS } from '../data/faq'
-import { moneyShort } from '../lib/format'
+import { money, moneyShort } from '../lib/format'
+import { kitListPrice, periodPrice, tablePrice } from '../services/pricing'
 import { useBag } from '../state/bag'
 import { usePageTitle } from '../state/hooks'
 import { CepCheck } from '../components/CepCheck'
@@ -42,7 +43,13 @@ const SIZE_FILTERS: { value: '' | Size | 'kit'; label: string }[] = [
   { value: 'kit', label: 'Kits' },
 ]
 
-const fromPrice = (size: Size) => Math.min(...MODELS.filter((m) => m.size === size && m.kind !== 'kit').map((m) => m.daily))
+/** Preço de uma semana do tamanho, o período mais comum de viagem. */
+const weekPrice = (size: Size) => tablePrice(BUSINESS.pricing.table[size], 7)
+
+/** Quanto os kits saem mais baratos que as malas avulsas, no melhor caso da tabela. */
+const kitSaving = Math.round(
+  Math.max(...MODELS.filter((m) => m.kind === 'kit').flatMap((m) => [1, 7, 15, 30].map((d) => 1 - periodPrice(m.id, 1, d) / kitListPrice(m, d)))) * 100,
+)
 
 /** Desce suavemente até a seção pedida por um link. Ao voltar, vale a posição em que a pessoa estava. */
 function useScrollToSection() {
@@ -156,7 +163,7 @@ function Sizes() {
           <Link to="/malas?tamanho=kit" className={styles.kitLink}>
             <Suitcase size={22} aria-hidden="true" />
             <span>
-              <strong>Kits Casal e Família</strong> saem até {moneyShort(10)} por dia mais baratos que as malas avulsas
+              <strong>Kits Casal e Família</strong> saem até {kitSaving}% mais baratos que as malas avulsas
             </span>
           </Link>
           <Link to="/malas" className={`link ${styles.allBags}`}>Ver todas as malas e preços</Link>
@@ -173,7 +180,7 @@ function Sizes() {
                   {heights[size]} cm, {SIZE_INFO[size].allowance.toLowerCase()}
                 </span>
                 <span className={styles.sizePrice}>
-                  a partir de <strong>{moneyShort(fromPrice(size))}</strong> por dia
+                  <strong>{money(weekPrice(size))}</strong> por 7 dias
                 </span>
               </Link>
             </li>
@@ -198,7 +205,7 @@ function Delivery() {
             <ul className={styles.facts}>
               <li>Toda a capital de São Paulo</li>
               <li>Janelas de {operations.deliveryWindows.map((w) => w.time).join(', ')}</li>
-              <li>A partir do dia seguinte à reserva</li>
+              <li>Já no dia da reserva</li>
             </ul>
             <CepCheck />
           </article>

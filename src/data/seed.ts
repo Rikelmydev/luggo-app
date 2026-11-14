@@ -1,5 +1,5 @@
-// Dados fictícios de demonstração: o estoque inicial de 30 malas do plano de negócio
-// e um histórico de pedidos inventados, gerado sempre igual a partir da data de hoje.
+// O estoque da loja (5 malas de cada cor em cada modelo) e um histórico de pedidos
+// inventados para a demonstração, gerado sempre igual a partir da data de hoje.
 import { BUSINESS } from '../config/business'
 import { MODELS, getModel, COLOR_INFO, type Color } from './catalog'
 import { addDays, todayISO, type ISODate } from '../lib/dates'
@@ -7,14 +7,20 @@ import { allocate } from '../services/availability'
 import { quote } from '../services/pricing'
 import type { Address, Fulfillment, Order, OrderStatus, StatusEvent, Unit } from '../domain/types'
 
-const STOCK: { modelId: string; prefix: string; colors: Color[] }[] = [
-  { modelId: 'bordo-rigida', prefix: 'BR', colors: ['laranja', 'azul', 'grafite', 'laranja', 'azul', 'grafite'] },
-  { modelId: 'bordo-expansivel', prefix: 'BE', colors: ['grafite', 'azul', 'grafite'] },
-  { modelId: 'media-rigida', prefix: 'MR', colors: ['laranja', 'azul', 'grafite', 'laranja', 'azul', 'grafite', 'laranja', 'azul'] },
-  { modelId: 'media-expansivel', prefix: 'ME', colors: ['azul', 'grafite', 'azul', 'grafite'] },
-  { modelId: 'grande-rigida', prefix: 'GR', colors: ['laranja', 'azul', 'grafite', 'laranja', 'azul', 'grafite'] },
-  { modelId: 'grande-expansivel', prefix: 'GE', colors: ['grafite', 'azul', 'grafite'] },
+/** Malas de cada cor, em cada modelo. */
+const PER_COLOR = 5
+// As cores se revezam na numeração (MR-01 laranja, MR-02 azul...); supabase/estoque.sql segue a mesma ordem.
+const STOCK: { modelId: string; prefix: string; palette: Color[] }[] = [
+  { modelId: 'bordo-rigida', prefix: 'BR', palette: ['laranja', 'azul', 'grafite'] },
+  { modelId: 'bordo-expansivel', prefix: 'BE', palette: ['grafite', 'azul'] },
+  { modelId: 'media-rigida', prefix: 'MR', palette: ['laranja', 'azul', 'grafite'] },
+  { modelId: 'media-expansivel', prefix: 'ME', palette: ['azul', 'grafite'] },
+  { modelId: 'grande-rigida', prefix: 'GR', palette: ['laranja', 'azul', 'grafite'] },
+  { modelId: 'grande-expansivel', prefix: 'GE', palette: ['grafite', 'azul'] },
 ]
+
+/** Quantas malas a loja tem. */
+export const STOCK_SIZE = STOCK.reduce((n, s) => n + s.palette.length * PER_COLOR, 0)
 
 const NAMES = [
   'Ana Beatriz Moreira', 'Lucas Ferreira', 'Juliana Sato', 'Rafael Nunes', 'Camila Oliveira', 'Thiago Barros',
@@ -66,7 +72,7 @@ export function buildSeed(now: Date): { units: Unit[]; orders: Order[] } {
   const between = (a: number, b: number) => a + Math.floor(rand() * (b - a + 1))
 
   const units: Unit[] = STOCK.flatMap((s) =>
-    s.colors.map((color, i) => ({
+    Array.from({ length: s.palette.length * PER_COLOR }, (_, i) => s.palette[i % s.palette.length]).map((color, i) => ({
       id: `${s.prefix}-${String(i + 1).padStart(2, '0')}`,
       modelId: s.modelId,
       color,

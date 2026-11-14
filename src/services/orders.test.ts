@@ -34,8 +34,8 @@ beforeEach(() => {
 })
 
 describe('dados de demonstração', () => {
-  it('tem as 30 malas do estoque inicial', () => {
-    expect(readDB().units).toHaveLength(30)
+  it('tem as 75 malas do estoque, 5 de cada cor', () => {
+    expect(readDB().units).toHaveLength(75)
   })
 
   it('nunca reserva a mesma mala em períodos que se cruzam', () => {
@@ -57,7 +57,9 @@ describe('dados de demonstração', () => {
 
 describe('período', () => {
   it('exige o mínimo de diárias e datas futuras', () => {
-    expect(validatePeriod(addDays(todayISO(), 5), addDays(todayISO(), 6))).toMatch(/mínimo/)
+    expect(validatePeriod(addDays(todayISO(), 5), addDays(todayISO(), 5))).toMatch(/mínimo/)
+    expect(validatePeriod(addDays(todayISO(), 5), addDays(todayISO(), 6))).toBeNull()
+    expect(validatePeriod(addDays(todayISO(), 5), addDays(todayISO(), 36))).toMatch(/30 diárias/)
     expect(validatePeriod(addDays(todayISO(), -1), addDays(todayISO(), 5))).toMatch(/passado/)
     expect(validatePeriod(addDays(todayISO(), 5), addDays(todayISO(), 9))).toBeNull()
   })
@@ -87,16 +89,14 @@ describe('pedido do começo ao fim', () => {
   })
 
   it('não deixa reservar mais malas do que existem', async () => {
-    const res = await createOrder(base({ items: [{ modelId: 'grande-expansivel', qty: 9 }] }))
+    const res = await createOrder(base({ items: [{ modelId: 'grande-expansivel', qty: 11 }] }))
     expect(res.ok).toBe(false)
   })
 
-  it('cobra entrega e exige retirada a partir de amanhã', async () => {
+  it('cobra entrega e já entrega no mesmo dia', async () => {
     const address = { cep: '04101-000', street: 'Rua Vergueiro', number: '100', district: 'Vila Mariana', city: 'São Paulo', uf: 'SP' }
     const today = await createOrder(base({ start: todayISO(), end: addDays(todayISO(), 4), fulfillment: { type: 'entrega', address, window: 'tarde' } }))
-    expect(today.ok).toBe(false)
-    const ok = await createOrder(base({ fulfillment: { type: 'entrega', address, window: 'tarde' } }))
-    expect(ok.ok && ok.value.price.delivery).toBe(24.9)
+    expect(today.ok && today.value.price.delivery).toBe(24.9)
   })
 
   it('cancela grátis com antecedência e estende quando as malas estão livres', async () => {

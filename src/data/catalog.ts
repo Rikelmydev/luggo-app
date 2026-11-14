@@ -16,7 +16,6 @@ export interface Model {
   kind: Kind
   /** Tamanho principal (para filtro). Kits usam o maior tamanho que contêm. */
   size: Size
-  daily: number
   colors: Color[]
   summary: string
   description: string
@@ -29,6 +28,8 @@ export interface Model {
   allowance?: string
   /** Para kits: quais malas avulsas compõem o kit. */
   contains?: { modelId: string; qty: number }[]
+  /** Preço próprio do kit pelo período (dias, valor); as malas avulsas usam a tabela do tamanho. */
+  prices?: readonly (readonly [number, number])[]
   idealFor: string
 }
 
@@ -55,7 +56,6 @@ export const MODELS: Model[] = [
     name: 'Bordo Rígida',
     kind: 'rigida',
     size: 'P',
-    daily: 14,
     colors: ['laranja', 'azul', 'grafite'],
     summary: 'Cabe no bagageiro do avião. Para viagens curtas e a trabalho.',
     description:
@@ -72,7 +72,6 @@ export const MODELS: Model[] = [
     name: 'Bordo Expansível',
     kind: 'expansivel',
     size: 'P',
-    daily: 16,
     colors: ['grafite', 'azul'],
     summary: 'De bordo com zíper de expansão, para a volta com sacolas.',
     description:
@@ -90,7 +89,6 @@ export const MODELS: Model[] = [
     name: 'Média Rígida',
     kind: 'rigida',
     size: 'M',
-    daily: 18,
     colors: ['laranja', 'azul', 'grafite'],
     summary: 'A mais alugada. Uma semana de viagem com folga.',
     description:
@@ -107,7 +105,6 @@ export const MODELS: Model[] = [
     name: 'Média Expansível',
     kind: 'expansivel',
     size: 'M',
-    daily: 20,
     colors: ['azul', 'grafite'],
     summary: 'Média com espaço extra para presentes e compras.',
     description:
@@ -125,7 +122,6 @@ export const MODELS: Model[] = [
     name: 'Grande Rígida',
     kind: 'rigida',
     size: 'G',
-    daily: 22,
     colors: ['laranja', 'azul', 'grafite'],
     summary: 'Para viagens longas, intercâmbio ou duas pessoas.',
     description:
@@ -142,7 +138,6 @@ export const MODELS: Model[] = [
     name: 'Grande Expansível',
     kind: 'expansivel',
     size: 'G',
-    daily: 25,
     colors: ['grafite', 'azul'],
     summary: 'A maior da casa. Intercâmbio, mudança e viagem longa.',
     description:
@@ -160,13 +155,13 @@ export const MODELS: Model[] = [
     name: 'Kit Casal',
     kind: 'kit',
     size: 'M',
-    daily: 32,
     colors: [],
     summary: 'Duas médias rígidas por um preço menor que avulsas.',
     description:
       'Duas Médias Rígidas para duas pessoas numa viagem de até 10 dias. As cores são sortidas de acordo com o estoque do dia.',
-    highlights: ['2 Médias Rígidas', 'Economia de R$ 4 por dia', 'Cores sortidas', 'Uma única devolução'],
+    highlights: ['2 Médias Rígidas', 'Mais barato que duas avulsas', 'Cores sortidas', 'Uma única devolução'],
     contains: [{ modelId: 'media-rigida', qty: 2 }],
+    prices: [[1, 59.9], [7, 159.9], [15, 249.9], [30, 319.9]],
     idealFor: 'Casal, 5 a 10 dias',
   },
   {
@@ -174,16 +169,16 @@ export const MODELS: Model[] = [
     name: 'Kit Família',
     kind: 'kit',
     size: 'G',
-    daily: 62,
     colors: [],
     summary: 'Duas grandes e duas de bordo para a família toda.',
     description:
       'Duas Grandes Rígidas para despachar e duas Bordo Rígidas para a cabine. Um único pedido, uma única devolução.',
-    highlights: ['2 Grandes + 2 de Bordo', 'Economia de R$ 10 por dia', 'Cores sortidas', 'Uma única devolução'],
+    highlights: ['2 Grandes + 2 de Bordo', 'Mais barato que quatro avulsas', 'Cores sortidas', 'Uma única devolução'],
     contains: [
       { modelId: 'grande-rigida', qty: 2 },
       { modelId: 'bordo-rigida', qty: 2 },
     ],
+    prices: [[1, 109.9], [7, 319.9], [15, 479.9], [30, 619.9]],
     idealFor: 'Família de 3 a 4 pessoas',
   },
 ]
@@ -198,9 +193,4 @@ export function modelImage(model: Model, color?: Color): string {
 /** Quantas malas físicas um item ocupa (kits contam cada mala). */
 export function unitsPerItem(model: Model): number {
   return model.contains ? model.contains.reduce((n, c) => n + c.qty, 0) : 1
-}
-
-/** Valor das malas avulsas que formam o kit, por dia. */
-export function kitListDaily(model: Model): number {
-  return (model.contains ?? []).reduce((sum, c) => sum + (getModel(c.modelId)?.daily ?? 0) * c.qty, 0)
 }

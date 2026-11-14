@@ -23,7 +23,7 @@ describe('painel da equipe', () => {
 
   it('conta aluguéis por modelo e mostra o quadro de hoje', () => {
     const per = rentalsPerModel(units, orders)
-    expect(per.reduce((n, p) => n + p.units, 0)).toBe(30)
+    expect(per.reduce((n, p) => n + p.units, 0)).toBe(75)
     const board = todayBoard(orders)
     expect(board.outgoing.length).toBeGreaterThanOrEqual(1)
     expect(board.returning.length).toBeGreaterThanOrEqual(1)

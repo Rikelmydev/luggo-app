@@ -61,7 +61,7 @@ export function DatesField({ start, end, onChange, variant = 'card', label = 'Da
         open={open}
         onClose={() => setOpen(false)}
         title="Quando é a viagem?"
-        description={`Mínimo de ${pricing.minDays} diárias. A mala passa ${operations.cleaningDays} dia em higienização depois de voltar.`}
+        description={`Mínimo de ${plural(pricing.minDays, 'diária', 'diárias')}. A mala passa ${operations.cleaningDays} dia em higienização depois de voltar.`}
         size="lg"
         footer={
           <>

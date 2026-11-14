@@ -6,7 +6,7 @@ import { money, moneyShort } from '../lib/format'
 import { useBag } from '../state/bag'
 import { useDataVersion, usePageTitle } from '../state/hooks'
 import { stockAvailable, validatePeriod } from '../services/orders'
-import { priceFormula, quote, rentalDays } from '../services/pricing'
+import { periodPrice, priceFormula, quote, rentalDays } from '../services/pricing'
 import { DatesField } from '../components/DatesField'
 import { PriceSummary } from '../components/PriceSummary'
 import { ReservasTabs } from '../components/ReservasTabs'
@@ -90,11 +90,10 @@ export function BagPage() {
                       </p>
                       <p className={styles.meta}>
                         {model.kind === 'kit' ? 'Kit, cores sortidas' : `${SIZE_INFO[model.size].label}, ${COLOR_INFO[item.color!].label}`}
-                        {' · '}
-                        {moneyShort(model.daily)} por dia
+                        {!days && <>{' · '}{money(periodPrice(model.id, 1, 7))} por 7 dias</>}
                       </p>
                       {days > 0 && (
-                        <p className={styles.formula}>{priceFormula(model.id, item.qty, days)} = <strong className="num">{money(model.daily * item.qty * days)}</strong></p>
+                        <p className={styles.formula}>{priceFormula(model.id, item.qty, days)} = <strong className="num">{money(periodPrice(model.id, item.qty, days))}</strong></p>
                       )}
                       {short && (
                         <p className={styles.short}>
@@ -104,7 +103,7 @@ export function BagPage() {
                     </div>
                     <div className={styles.controls}>
                       <Stepper value={item.qty} onChange={(n) => bag.setQty(item.key, n)} max={Math.max(item.qty, available ?? 4)} label={`Quantidade de ${model.name}`} />
-                      <p className={`${styles.lineTotal} num`}>{days ? money(model.daily * item.qty * days) : '--'}</p>
+                      <p className={`${styles.lineTotal} num`}>{days ? money(periodPrice(model.id, item.qty, days)) : '--'}</p>
                       <button type="button" className={styles.remove} onClick={() => bag.remove(item.key)} aria-label={`Remover ${model.name}`}>
                         <Trash size={18} />
                         <span>Remover</span>

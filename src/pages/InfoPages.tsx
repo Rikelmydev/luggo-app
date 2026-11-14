@@ -15,7 +15,8 @@ import {
 } from '../components/ui/icons'
 import { BUSINESS } from '../config/business'
 import { MODELS } from '../data/catalog'
-import { isEmail, money, moneyShort } from '../lib/format'
+import { STOCK_SIZE } from '../data/seed'
+import { isEmail, money, moneyShort, plural } from '../lib/format'
 import { sendContact } from '../services/orders'
 import { usePageTitle } from '../state/hooks'
 import { PageIntro } from '../components/layout/PageIntro'
@@ -29,7 +30,7 @@ const { pricing, operations, store } = BUSINESS
 export function HowItWorks() {
   usePageTitle('Como funciona')
   const steps = [
-    { icon: CalendarCheck, title: 'Escolha a mala e as datas', text: `Veja no calendário o que está livre. O mínimo é de ${pricing.minDays} diárias e você reserva com até ${operations.maxAdvanceDays} dias de antecedência.` },
+    { icon: CalendarCheck, title: 'Escolha a mala e as datas', text: `Veja no calendário o que está livre. Dá para alugar de ${plural(pricing.minDays, 'dia', 'dias')} a ${operations.maxDays} dias, com até ${operations.maxAdvanceDays} dias de antecedência.` },
     { icon: CreditCard, title: 'Pague com Pix ou cartão', text: `Pelo Mercado Pago. As malas ficam separadas por ${operations.pixMinutes} minutos enquanto você paga, e a reserva confirma na hora.` },
     { icon: Truck, title: 'Receba em casa ou retire na loja', text: `Entregamos na capital por ${moneyShort(pricing.deliveryFee)} com a coleta, na janela de horário que você escolher. Na loja da Vila Mariana, a retirada é grátis.` },
     { icon: ArrowUUpLeft, title: 'Viaje e devolva', text: 'No último dia, coletamos no mesmo endereço ou você deixa na loja. Pode devolver antes, se voltar mais cedo.' },
@@ -54,10 +55,10 @@ export function HowItWorks() {
         <section className={styles.policies} aria-labelledby="regras" data-reveal="">
           <h2 id="regras" className="display h2">As regras, sem letra miúda</h2>
           <dl className={styles.policyGrid}>
-            <div><dt><ClockCountdown size={22} aria-hidden="true" />Desconto por período</dt><dd>10% a partir de 7 diárias e 20% a partir de 14.</dd></div>
+            <div><dt><ClockCountdown size={22} aria-hidden="true" />Preço por período</dt><dd>Você paga o aluguel inteiro, não a diária: quanto mais dias, menor o preço por dia.</dd></div>
             <div><dt><ShieldCheck size={22} aria-hidden="true" />Proteção Luggo</dt><dd>{moneyShort(pricing.protectionPerDay)} por mala por dia. Cobre danos de uso em rodas, alças, zíperes e casco.</dd></div>
             <div><dt><XCircle size={22} aria-hidden="true" />Cancelamento</dt><dd>Grátis até {operations.freeCancelHours} horas antes da retirada, pela página da reserva.</dd></div>
-            <div><dt><CalendarCheck size={22} aria-hidden="true" />Ficar mais dias</dt><dd>Peça pela página da reserva: diária cheia, sem desconto. Atraso sem aviso custa a diária com 20% a mais.</dd></div>
+            <div><dt><CalendarCheck size={22} aria-hidden="true" />Ficar mais dias</dt><dd>Peça pela página da reserva e pague só a diferença na tabela. Atraso sem aviso custa o preço de 1 dia com 20% a mais.</dd></div>
           </dl>
           <Link to="/malas" className="btn btn--blue btn--lg">Ver malas disponíveis</Link>
         </section>
@@ -85,7 +86,7 @@ export function Terms() {
         </section>
         <section>
           <h2>2. Reserva e pagamento</h2>
-          <p>A reserva confirma quando o pagamento é aprovado pelo Mercado Pago. Enquanto o pagamento não é feito, as malas ficam separadas por {operations.pixMinutes} minutos. O período mínimo é de {pricing.minDays} diárias.</p>
+          <p>A reserva confirma quando o pagamento é aprovado pelo Mercado Pago. Enquanto o pagamento não é feito, as malas ficam separadas por {operations.pixMinutes} minutos. O aluguel vai de {plural(pricing.minDays, 'diária', 'diárias')} a {operations.maxDays} diárias.</p>
         </section>
         <section>
           <h2>3. Entrega, retirada e documentos</h2>
@@ -97,7 +98,7 @@ export function Terms() {
         </section>
         <section>
           <h2>5. Devolução, atraso e extensão</h2>
-          <p>A devolução é até o fim do horário da loja (ou da janela de coleta) do último dia. Para ficar mais dias, peça a extensão pela página da reserva: os dias extras custam a diária cheia. Atraso sem aviso custa a diária com {Math.round((pricing.extraDayFactor - 1) * 100)}% a mais, por dia.</p>
+          <p>A devolução é até o fim do horário da loja (ou da janela de coleta) do último dia. Para ficar mais dias, peça a extensão pela página da reserva: os dias extras custam a diferença entre o preço do período novo e o já pago. Atraso sem aviso custa o preço de 1 dia com {Math.round((pricing.extraDayFactor - 1) * 100)}% a mais, por dia.</p>
         </section>
         <section>
           <h2>6. Danos, extravio e Proteção Luggo</h2>
@@ -205,7 +206,7 @@ export function About() {
     { name: 'Bianca', role: 'Cofundadora', tone: styles.tagYellow },
     { name: 'Rikelmy', role: 'Cofundador', tone: styles.tagDeep },
   ]
-  const units = 30
+  const units = STOCK_SIZE
   return (
     <>
       <PageIntro title="A mala que você usa poucas vezes não precisa morar na sua casa" />

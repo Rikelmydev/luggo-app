@@ -56,7 +56,9 @@ export interface PriceLine {
   label: string
   qty: number
   days: number
-  daily: number
+  /** Preço de uma mala (ou kit) pelo período inteiro. Pedidos antigos guardavam a diária em daily. */
+  unit?: number
+  daily?: number
   subtotal: number
 }
 

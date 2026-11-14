@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { COLOR_INFO, SIZE_INFO, kitListDaily, modelImage, type Color, type Model } from '../data/catalog'
-import { money, moneyShort, plural } from '../lib/format'
-import { discountFor, periodPrice } from '../services/pricing'
+import { COLOR_INFO, SIZE_INFO, modelImage, type Color, type Model } from '../data/catalog'
+import { money, plural } from '../lib/format'
+import { kitListPrice, periodPrice } from '../services/pricing'
 import styles from './ProductCard.module.css'
 
 interface Props {
@@ -16,6 +16,7 @@ export function ProductCard({ model, days, available }: Props) {
   const [color, setColor] = useState<Color | undefined>(model.colors[0])
   const href = `/malas/${model.id}${color ? `?cor=${color}` : ''}`
   const soldOut = available === 0
+  const shown = days > 0 ? days : 7
   return (
     <article className={`${styles.card} ${soldOut ? styles.soldOut : ''}`}>
       <Link to={href} className={styles.media} tabIndex={-1} aria-hidden="true">
@@ -51,15 +52,15 @@ export function ProductCard({ model, days, available }: Props) {
           </div>
         )}
 
+        {/* Sem datas, mostra a semana; com datas, o preço exato do período escolhido. */}
         <div className={styles.price}>
           <p>
-            <strong className="num">{moneyShort(model.daily)}</strong> por dia
-            {model.kind === 'kit' && <span className={styles.was}> em vez de {moneyShort(kitListDaily(model))}</span>}
+            <strong className="num">{money(periodPrice(model.id, 1, shown))}</strong> por {plural(shown, 'dia', 'dias')}
+            {model.kind === 'kit' && <span className={styles.was}> em vez de {money(kitListPrice(model, shown))}</span>}
           </p>
-          {days > 0 && (
+          {days === 0 && (
             <p className={styles.period}>
-              {plural(days, 'diária', 'diárias')} × {moneyShort(model.daily)} = <strong className={`${styles.total} num`}>{money(model.daily * days)}</strong>
-              {discountFor(days) > 0 && <>, com {Math.round(discountFor(days) * 100)}% off: {money(periodPrice(model.id, 1, days))}</>}
+              1 dia: {money(periodPrice(model.id, 1, 1))} · 30 dias: {money(periodPrice(model.id, 1, 30))}
             </p>
           )}
         </div>

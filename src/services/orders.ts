@@ -3,12 +3,13 @@
 import { BUSINESS } from '../config/business'
 import { COLOR_INFO, getModel, type Color } from '../data/catalog'
 import { makeCode } from '../data/seed'
-import { addDays, diffDays, fromISO, todayISO, type ISODate } from '../lib/dates'
+import { addDays, diffDays, formatWeekday, fromISO, todayISO, type ISODate } from '../lib/dates'
 import type { ContactMessage, Customer, Fulfillment, Order, OrderStatus, PaymentMethod, Unit } from '../domain/types'
 import { allocate, availableCount, canExtend, dailyAvailability, holdsUnits } from './availability'
 import { createPixCharge } from './payments'
 import { extensionQuote, quote, rentalDays } from './pricing'
 import { reminderDue } from './reminders'
+import { plural } from '../lib/format'
 import * as remote from './remote'
 import { delay, readDB, updateDB } from './storage'
 import { REMOTE } from './supabase'
@@ -64,7 +65,7 @@ export function stockByDay(modelId: string, color: Color | undefined, days: ISOD
   return dailyAvailability(ctx(), modelId, color, days)
 }
 
-/** Primeiro dia possível para retirada: hoje na loja, amanhã com entrega. */
+/** Primeiro dia possível para retirada: hoje na loja e, com o prazo de entrega atual, hoje também em casa. */
 export function earliestStart(delivery = false): ISODate {
   return addDays(todayISO(), delivery ? operations.deliveryLeadDays : 0)
 }
@@ -73,7 +74,7 @@ export function validatePeriod(start?: ISODate, end?: ISODate): string | null {
   if (!start || !end) return 'Escolha as datas de retirada e devolução.'
   if (start < todayISO()) return 'A retirada não pode ser no passado.'
   const days = rentalDays(start, end)
-  if (days < pricing.minDays) return `O aluguel mínimo é de ${pricing.minDays} diárias.`
+  if (days < pricing.minDays) return `O aluguel mínimo é de ${plural(pricing.minDays, 'diária', 'diárias')}.`
   if (days > operations.maxDays) return `Para mais de ${operations.maxDays} diárias, fale com a gente.`
   if (diffDays(todayISO(), start) > operations.maxAdvanceDays) return 'Ainda não abrimos reservas para essa data.'
   return null
@@ -128,7 +129,7 @@ export async function createOrder(input: NewOrder): Promise<Result<Order>> {
   if (periodError) return { ok: false, error: periodError }
   if (!input.items.length) return { ok: false, error: 'Sua reserva está vazia.' }
   if (input.fulfillment.type === 'entrega' && input.start < earliestStart(true)) {
-    return { ok: false, error: 'Para entrega em casa, a retirada precisa ser a partir de amanhã.' }
+    return { ok: false, error: `Para entrega em casa, a retirada precisa ser a partir de ${formatWeekday(earliestStart(true))}.` }
   }
 
   const c = ctx()
@@ -306,7 +307,7 @@ export async function cancelOrder(code: string): Promise<Result<Order>> {
 }
 
 export function extensionPrice(order: Order, days: number): number {
-  return extensionQuote(order.items, days, order.protection)
+  return extensionQuote(order.items, rentalDays(order.start, order.end), days, order.protection)
 }
 
 export function checkExtension(order: Order, days: number): string | null {

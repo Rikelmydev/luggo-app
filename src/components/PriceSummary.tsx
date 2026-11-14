@@ -18,7 +18,7 @@ export function PriceSummary({ price, deliveryNote, totalLabel = 'Total' }: Prop
         <div key={l.label} className={styles.row}>
           <dt>
             {l.label}
-            <span className={styles.sub}>{priceFormula(l.modelId, l.qty, l.days)}</span>
+            <span className={styles.sub}>{priceFormula(l.modelId, l.qty, l.days, l.subtotal / l.qty)}</span>
           </dt>
           <dd className="num">{money(l.subtotal)}</dd>
         </div>

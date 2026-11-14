@@ -41,6 +41,10 @@
 .daily { display: grid; }
 .daily strong { font-size: 2rem; font-weight: 880; font-stretch: 104%; color: var(--accent-ink); letter-spacing: -0.02em; }
 .dailyNote { color: var(--ink-2); font-size: 0.875rem; }
+.priceTable { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: -6px; }
+.priceTable div { padding: 8px 6px; border-radius: 12px; background: var(--paper-2); border: 1px solid var(--line); text-align: center; }
+.priceTable dt { color: var(--ink-2); font-size: 0.75rem; font-weight: 650; }
+.priceTable dd { font-weight: 800; font-size: 0.9375rem; }
 .colors legend { font-size: 0.9375rem; margin-bottom: 10px; }
 .swatches { display: flex; gap: 12px; }
 .swatch { position: relative; cursor: pointer; }

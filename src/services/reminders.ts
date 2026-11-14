@@ -65,7 +65,7 @@ export function returnEmail(order: Order): { to: string; subject: string; paragr
       delivery
         ? 'Vamos buscar as malas no mesmo endereço da entrega, na janela de horário que você escolheu. Deixe tudo vazio e fechado, e alguém precisa estar lá para entregar.'
         : `Deixe as malas vazias na ${BUSINESS.store.name}: ${BUSINESS.store.address}.`,
-      'Quer ficar mais dias? Peça pela página da reserva antes do fim do aluguel: os dias extras saem pela diária cheia.',
+      'Quer ficar mais dias? Peça pela página da reserva antes do fim do aluguel: você paga só a diferença na tabela.',
       'Boa volta!',
     ],
   }

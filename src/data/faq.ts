@@ -1,5 +1,6 @@
 import { BUSINESS } from '../config/business'
-import { moneyShort } from '../lib/format'
+import { money, moneyShort, plural } from '../lib/format'
+import { tablePrice } from '../services/pricing'
 
 const { pricing, operations } = BUSINESS
 
@@ -10,10 +11,10 @@ export const FAQ: FaqGroup[] = [
   {
     title: 'Reserva',
     items: [
-      { q: 'Qual é o período mínimo de aluguel?', a: `${pricing.minDays} diárias. Contamos as diárias entre o dia da retirada e o dia da devolução: de sábado a sábado são 7 diárias.` },
-      { q: 'Tem desconto para viagens longas?', a: 'Sim. A partir de 7 diárias o aluguel sai 10% mais barato, e a partir de 14 diárias, 20%. O desconto aparece sozinho no resumo.' },
+      { q: 'Qual é o período mínimo de aluguel?', a: `${plural(pricing.minDays, 'diária', 'diárias')}. Contamos as diárias entre o dia da retirada e o dia da devolução: de sábado a sábado são 7 diárias.` },
+      { q: 'Quanto custa?', a: `O preço é pelo período inteiro e cai por dia quanto mais longa a viagem: uma de bordo sai ${money(tablePrice(pricing.table.P, 1))} por 1 dia, ${money(tablePrice(pricing.table.P, 7))} por 7 dias e ${money(tablePrice(pricing.table.P, 30))} por 30 dias. A tabela completa de cada mala aparece na página dela.` },
       { q: 'Posso reservar mais de uma mala?', a: 'Pode. Junte quantas malas quiser na mesma reserva, de tamanhos e cores diferentes. Para a família toda, os kits saem mais em conta.' },
-      { q: 'Com quanta antecedência preciso reservar?', a: `Para retirar na loja, até no mesmo dia, se houver mala livre. Para entrega em casa, a partir do dia seguinte. As reservas abrem com até ${operations.maxAdvanceDays} dias de antecedência.` },
+      { q: 'Com quanta antecedência preciso reservar?', a: `Para retirar na loja, até no mesmo dia, se houver mala livre. Para entrega em casa, também no mesmo dia. As reservas abrem com até ${operations.maxAdvanceDays} dias de antecedência.` },
     ],
   },
   {
@@ -31,7 +32,7 @@ export const FAQ: FaqGroup[] = [
       { q: 'Quais as formas de pagamento?', a: 'Pix ou cartão de crédito, pelo Mercado Pago. O cartão é digitado no próprio Mercado Pago: a Luggo nunca vê os dados dele.' },
       { q: 'Quando a reserva é confirmada?', a: `Assim que o pagamento é aprovado. O Pix vale por ${operations.pixMinutes} minutos; nesse tempo, as malas ficam separadas para você.` },
       { q: 'Posso cancelar?', a: `Sim, sem custo até ${operations.freeCancelHours} horas antes da retirada, pela página da reserva. O valor volta pela mesma forma de pagamento.` },
-      { q: 'Dá para ficar mais dias com a mala?', a: 'Dá, se as mesmas malas estiverem livres depois. Peça pela página da reserva antes do fim do aluguel: os dias extras saem pela diária cheia. Atraso sem aviso custa a diária com 20% a mais.' },
+      { q: 'Dá para ficar mais dias com a mala?', a: 'Dá, se as mesmas malas estiverem livres depois. Peça pela página da reserva antes do fim do aluguel: você paga só a diferença entre o período novo e o que já pagou, pela tabela. Atraso sem aviso custa o preço de 1 dia com 20% a mais, por dia.' },
     ],
   },
   {
