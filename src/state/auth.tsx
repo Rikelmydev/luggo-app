@@ -55,7 +55,9 @@ function authError(message: string): string {
   if (m.includes('unable to validate email') || m.includes('invalid email')) return 'Confira o e-mail.'
   if (m.includes('rate limit') || m.includes('too many')) return 'Muitas tentativas seguidas. Espere um pouco e tente de novo.'
   if (m.includes('provider is not enabled')) return 'O login com Google ainda não foi ativado.'
-  if (m.includes('email logins are disabled') || m.includes('signups not allowed')) return 'O login por e-mail está desativado no momento.'
+  if (m.includes('email logins are disabled') || m.includes('email signups are disabled') || m.includes('signups not allowed')) {
+    return 'O login por e-mail está desativado no momento.'
+  }
   return 'Não deu para entrar agora. Tente de novo em instantes.'
 }
 
