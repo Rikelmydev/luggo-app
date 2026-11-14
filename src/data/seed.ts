@@ -7,6 +7,9 @@ import { allocate } from '../services/availability'
 import { quote } from '../services/pricing'
 import type { Address, Fulfillment, Order, OrderStatus, StatusEvent, Unit } from '../domain/types'
 
+/** A mala que a demonstração coloca em manutenção (a limpeza devolve ela ao estoque). */
+export const DEMO_REPAIR_NOTE = 'Roda traseira trocada, volta ao estoque após teste'
+
 /** Malas de cada cor, em cada modelo. */
 const PER_COLOR = 5
 // As cores se revezam na numeração (MR-01 laranja, MR-02 azul...); supabase/estoque.sql segue a mesma ordem.
@@ -83,7 +86,7 @@ export function buildSeed(now: Date): { units: Unit[]; orders: Order[] } {
   const broken = units.find((u) => u.id === 'ME-04')
   if (broken) {
     broken.maintenance = true
-    broken.note = 'Roda traseira trocada, volta ao estoque após teste'
+    broken.note = DEMO_REPAIR_NOTE
   }
 
   // Modelos mais alugados aparecem mais vezes (média rígida lidera, como no plano).

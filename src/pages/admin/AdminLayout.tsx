@@ -1,16 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
-import { ArrowCounterClockwise, ChartBar, ListChecks, Package, SignOut, Storefront, SunHorizon } from '../../components/ui/icons'
+import { ArrowCounterClockwise, Broom, ChartBar, ListChecks, Package, SignOut, Storefront, SunHorizon } from '../../components/ui/icons'
 import { BUSINESS } from '../../config/business'
-import { buildSeed } from '../../data/seed'
-import { enterStaff, leaveStaff, resetDemo } from '../../services/remote'
-import { readDB, resetDemoData } from '../../services/storage'
+import { DEMO_REPAIR_NOTE, buildSeed } from '../../data/seed'
+import { clearDemo, enterStaff, leaveStaff, resetDemo } from '../../services/remote'
+import { clearDemoData, readDB, resetDemoData } from '../../services/storage'
 import { REMOTE } from '../../services/supabase'
 import { useAuth } from '../../state/auth'
 import { usePageTitle } from '../../state/hooks'
 import { AccountLogin } from '../../components/LoginCard'
 import { BrandMark } from '../../components/layout/Brand'
 import { Notice } from '../../components/ui/Bits'
+import { Modal } from '../../components/ui/Modal'
 import { useToast } from '../../components/ui/Toast'
 import styles from './Admin.module.css'
 
@@ -35,6 +36,9 @@ function DemoAccess() {
     <AdminShell
       onReset={async () => {
         resetDemoData(true)
+      }}
+      onClear={async () => {
+        clearDemoData()
       }}
       onSignOut={() => {
         try {
@@ -112,13 +116,16 @@ function StaffAccess() {
         const seed = buildSeed(new Date())
         await resetDemo(seed.units, seed.orders)
       }}
+      onClear={() => clearDemo(DEMO_REPAIR_NOTE)}
       onSignOut={exit}
     />
   )
 }
 
-function AdminShell({ onReset, onSignOut }: { onReset: () => Promise<void>; onSignOut: () => void }) {
+function AdminShell({ onReset, onClear, onSignOut }: { onReset: () => Promise<void>; onClear: () => Promise<void>; onSignOut: () => void }) {
   const notify = useToast()
+  const [clearing, setClearing] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   const links = [
     { to: '/equipe', label: 'Hoje', icon: SunHorizon, end: true },
@@ -154,6 +161,9 @@ function AdminShell({ onReset, onSignOut }: { onReset: () => Promise<void>; onSi
           >
             <ArrowCounterClockwise size={18} aria-hidden="true" />Restaurar demonstração
           </button>
+          <button type="button" className={styles.sideLink} onClick={() => setClearing(true)}>
+            <Broom size={18} aria-hidden="true" />Limpar demonstração
+          </button>
           <button
             type="button"
             className={styles.sideLink}
@@ -167,6 +177,39 @@ function AdminShell({ onReset, onSignOut }: { onReset: () => Promise<void>; onSi
         <Outlet />
       </main>
       <ScrollRestoration />
+      <Modal
+        open={clearing}
+        onClose={() => setClearing(false)}
+        locked={busy}
+        size="sm"
+        title="Limpar a demonstração?"
+        description="Apaga todos os pedidos de exemplo. As reservas feitas pelo site continuam no painel."
+        footer={
+          <>
+            <button type="button" className="btn btn--ghost" onClick={() => setClearing(false)} disabled={busy}>Voltar</button>
+            <button
+              type="button"
+              className="btn btn--danger"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true)
+                try {
+                  await onClear()
+                  notify('Pedidos de exemplo apagados. Só ficaram as reservas do site.')
+                  setClearing(false)
+                } catch {
+                  notify('Não deu para limpar agora. Tente de novo.')
+                }
+                setBusy(false)
+              }}
+            >
+              {busy ? 'Limpando...' : 'Apagar pedidos de exemplo'}
+            </button>
+          </>
+        }
+      >
+        <p className={styles.muted}>Para ver os exemplos de novo, use Restaurar demonstração quando quiser.</p>
+      </Modal>
     </div>
   )
 }

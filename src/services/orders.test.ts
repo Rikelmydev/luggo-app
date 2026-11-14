@@ -13,7 +13,7 @@ import {
   validatePeriod,
   type NewOrder,
 } from './orders'
-import { network, readDB, resetDemoData } from './storage'
+import { clearDemoData, network, readDB, resetDemoData } from './storage'
 import { buildSeed } from '../data/seed'
 
 network.latency = 0
@@ -131,5 +131,18 @@ describe('CEP', () => {
       new Response(JSON.stringify({ logradouro: 'Rua Vergueiro', bairro: 'Vila Mariana', localidade: 'São Paulo', uf: 'SP' }))) as typeof fetch
     const r = await lookupCep('04101000', found)
     expect(r.ok && r.address).toEqual({ cep: '04101-000', street: 'Rua Vergueiro', district: 'Vila Mariana', city: 'São Paulo', uf: 'SP' })
+  })
+})
+
+describe('limpar a demonstração', () => {
+  it('apaga só os pedidos de exemplo e tira a manutenção de exemplo', async () => {
+    const mine = await createOrder(base())
+    expect(readDB().orders.some((o) => o.source === 'demo')).toBe(true)
+    clearDemoData()
+    const db = readDB()
+    expect(db.orders.every((o) => o.source === 'site')).toBe(true)
+    expect(mine.ok && db.orders.some((o) => o.code === mine.value.code)).toBe(true)
+    expect(db.units.some((u) => u.maintenance)).toBe(false)
+    expect(db.units).toHaveLength(75)
   })
 })

@@ -212,6 +212,15 @@ export async function sendMessage(msg: ContactMessage) {
   if (error) throw error
 }
 
+/** Equipe: apaga só os pedidos de exemplo e devolve ao estoque a mala que a demonstração pôs em conserto. */
+export async function clearDemo(repairNote: string) {
+  const del = await sb().from('orders').delete().eq('source', 'demo')
+  if (del.error) throw del.error
+  const fix = await sb().from('units').update({ maintenance: false, note: null }).eq('note', repairNote)
+  if (fix.error) throw fix.error
+  await Promise.all([loadPublic(), staff ? loadAll() : loadMine()])
+}
+
 export async function resetDemo(units: Unit[], orders: Order[]) {
   const { error } = await sb().rpc('reset_demo', { p_units: units, p_orders: orders })
   if (error) throw error

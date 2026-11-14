@@ -1,7 +1,7 @@
 // Dados que as telas leem na hora. Sem Supabase, é o banco inteiro guardado no navegador;
 // com Supabase, é uma cópia do que esta pessoa pode ver, mantida em dia por services/remote.ts.
 import type { ContactMessage, Order, Unit } from '../domain/types'
-import { buildSeed } from '../data/seed'
+import { DEMO_REPAIR_NOTE, buildSeed } from '../data/seed'
 import { REMOTE } from './supabase'
 
 export interface DB {
@@ -94,6 +94,18 @@ export function resetDemoData(keepSiteOrders = true): DB {
   const fresh = seedDB()
   const mine = keepSiteOrders ? readDB().orders.filter((o) => o.source === 'site') : []
   const next = { ...fresh, orders: [...fresh.orders, ...mine], messages: readDB().messages }
+  writeDB(next)
+  return next
+}
+
+/** Tira os pedidos de exemplo e a manutenção de exemplo; as reservas feitas pelo site ficam. */
+export function clearDemoData(): DB {
+  const db = readDB()
+  const next = {
+    ...db,
+    orders: db.orders.filter((o) => o.source !== 'demo'),
+    units: db.units.map((u) => (u.note === DEMO_REPAIR_NOTE ? { ...u, maintenance: false, note: undefined } : u)),
+  }
   writeDB(next)
   return next
 }
